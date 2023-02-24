@@ -1,0 +1,60 @@
+---
+title: "Data Exploration"
+author: "Isabella Escamilla"
+output:
+  html_document:
+    toc: true
+    toc_float: true
+    code_folding: show
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE,
+                      warning = FALSE, eval = FALSE)
+library(tidyverse)
+library(jsonlite)
+library(httr)
+library(rjson)
+library(jsonlite)
+```
+
+### Importing the Data Set
+To start off, we need to take a look at the data set and explore what it has to offer. Upon first look, we can see that the data comes in a nested format, with each outfit having the attributes `name`, `views`, `items`, `image`, `likes`, `date`, `set_url`, and `desc`. The `items` attribute is nested, which means it has its own set of attributes within it. This includes `index`, `name`, `price`, `likes`, `image`, and `categoryid`, which all describe parts of an outfit. The nesting isn't too bad, and the jsonlite package has some helpful functions which I will be using for the set.
+
+```{r}
+trainloc <- './polyvore_data/train_no_dup.json'
+train_json <- jsonlite::fromJSON('./polyvore_data/train_no_dup.json', flatten=TRUE, simplifyDataFrame = TRUE)
+train_df <- as.data.frame(train_json)
+```
+
+
+```{r}
+dim(train_df)
+head(train_df,n=3)
+```
+
+### Formatting the Data Frame
+In the resulting data frame, each observation constitutes one outfit as intended, but the values in the `items` column are data frames. We can access these items and append them as new columns in the main data frame. We can start by examining the nests...
+
+```{r}
+train_df$items %>% head(1)
+```
+
+From each outfit's `items` data frame, we will want to take `name`, `price`, `likes`, and `categoryid`. The most simplest columns to add to the final data frame are `price` and `likes`, so we will start there.
+
+```{r}
+itemslist <- train_df$items
+itemslist %>% sapply(apply())
+```
+We will need to be able to perform an operation on a tibble of dataframes
+
+*Note to future me:* `name` and `categoryid` carry similar information, so it will be easy to combine these two into one variable using PCA so that there are only up to 8 outfit variables instead of 16
+
+https://stackoverflow.com/questions/43080531/r-expand-column-of-dataframes-in-existing-dataframe
+```{r}
+length(train_df$items$index) <- 8
+new_df <- do.call(data.frame, train_df)
+```
+
+
+
