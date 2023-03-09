@@ -21,10 +21,15 @@ library(jsonlite)
 ### Importing the Data Set
 To start off, we need to take a look at the data set and explore what it has to offer. Upon first look, we can see that the data comes in a nested format, with each outfit having the attributes `name`, `views`, `items`, `image`, `likes`, `date`, `set_url`, and `desc`. The `items` attribute is nested, which means it has its own set of attributes within it. This includes `index`, `name`, `price`, `likes`, `image`, and `categoryid`, which all describe parts of an outfit. The nesting isn't too bad, and the jsonlite package has some helpful functions which I will be using for the set.
 
-```{r}
-trainloc <- './polyvore_data/train_no_dup.json'
-train_json <- jsonlite::fromJSON('./polyvore_data/train_no_dup.json', flatten=TRUE, simplifyDataFrame = TRUE)
+```{r, eval=FALSE}
+trainloc <- '/Users/bellaesc/Desktop/school/Year 3/Winter/PSTAT131/Project/polyvore_mlproject/polyvore_data/train_no_dup.json'
+#trainloc <- './polyvore_data/train_no_dup.json'
+train_json <- jsonlite::fromJSON(trainloc, flatten=TRUE, simplifyDataFrame = TRUE)
 train_df <- as.data.frame(train_json)
+```
+
+```{r}
+
 ```
 
 
@@ -44,17 +49,20 @@ From each outfit's `items` data frame, we will want to take `name`, `price`, `li
 
 ```{r}
 itemslist <- train_df$items
-itemslist %>% sapply(apply())
+itemslist %>% head()
 ```
 We will need to be able to perform an operation on a tibble of dataframes
 
 *Note to future me:* `name` and `categoryid` carry similar information, so it will be easy to combine these two into one variable using PCA so that there are only up to 8 outfit variables instead of 16
 
 https://stackoverflow.com/questions/43080531/r-expand-column-of-dataframes-in-existing-dataframe
+
+### Trying to unpack the dataframe column (items)
+
 ```{r}
-length(train_df$items$index) <- 8
-new_df <- do.call(data.frame, train_df)
+#as_tibble(train_df$items) %>% unnest() #error: missing values
 ```
 
+* I'm clearly struggling. I'm gonna try this in python lol.
 
 
