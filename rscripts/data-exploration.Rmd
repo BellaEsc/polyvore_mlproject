@@ -12,41 +12,15 @@ output:
 knitr::opts_chunk$set(echo = TRUE, message = FALSE,
                       warning = FALSE, eval = FALSE)
 library(tidyverse)
-library(jsonlite)
-library(httr)
-library(rjson)
-library(jsonlite)
 ```
 
-### Importing the Data Set
-To start off, we need to take a look at the data set and explore what it has to offer.*ADD RAW DATA HEAD HERE* Upon first look, we can see that the data comes in a nested format, with each observation having the attributes `name`, `views`, `items`, `image`, `likes`, `date`, `set_url`, and `desc`. The `items` attribute is nested, which means it has its own set of attributes within it. This includes `index`, `name`, `price`, `likes`, `image`, and `categoryid`, which all describe parts of an outfit. The nesting isn't too bad, and the jsonlite package has some helpful functions which I will be using for the set.
+
+## Exploring the Data
+Now that we've tidied the data in a format that will be better suited for our analysis, we can begin by making some plots and seeing how the data is distributed.
 
 ```{r}
-trainloc <- './polyvore_data/train_no_dup.json'
-train_json <- jsonlite::fromJSON('./polyvore_data/train_no_dup.json', flatten=TRUE)
-train_df <- as.data.frame(train_json)
+outfits <- read.csv('tidy_data.csv')
+outfits %>% head()
 ```
 
-
-```{r}
-length(train_df)
-head(train_df,n=3)
-```
-
-### Formatting the Data Frame
-In the resulting data frame, each observation constitutes one outfit as intended, but the values in the `items` column are data frames. We can access these items and append them as new columns in the final data frame. We can start by examining the nests...
-
-```{r}
-train_df$items %>% head(1)
-```
-
-Each value of `items` is a data frame with 6 columns. Each row is an observation corresponding to each clothing item in the outfit. Out of all of the columns, we will want to keep `name`, ~~and~~ `categoryid`, `price`, and `likes`. ~~only~~. ~~While `price` and `likes` would likely be helpful in making predictions, I've opted to exclude them. I'm excluding price because I want to focus on using the outfits' aesthetics for the predictions, and excluding likes because it would make it harder for this model to apply to other things, such as your own closet items where you wouldn't know how many likes your sweatshirt has.~~
-
-*Note to future me:* `name` and `categoryid` carry similar information, so it will be easy to combine these two into one variable using PCA so that there are only up to 8 outfit variables instead of 16
-
-The simplest columns to add are `price` and `likes`. Since there are up to 8 different items in each outfit, adding each individual item's values for these categories would add up to 16 columns to the final data frame. Instead of doing that, I will simply take their sums and create two variables, `totalprice` and `itemlikes`.
-
-```{r}
-totalprice <- train_df$items
-totalpr %>% 
-```
+In the final data set, there are 
