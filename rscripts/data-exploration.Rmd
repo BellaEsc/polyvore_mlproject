@@ -10,19 +10,115 @@ output:
     code_folding: show
 ---
 
+<style type = "text/css">
+  body{
+  font-family: trebuchet ms, sans-serif;
+}
+.list-group-item.active, .list-group-item.active:focus, .list-group-item.active:hover {
+    background-color: lightcoral;
+}
+</style>
+
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE, message = FALSE,
-                      warning = FALSE, eval = FALSE)
+                      warning = FALSE, eval = TRUE)
 library(tidyverse)
+library(ggplot2)
+library(extrafont)
+
+```
+
+```{r, include=FALSE}
+loadfonts(device='win', quiet = FALSE)
+font_add('trebuchet', 'C:/windows/fonts/trebuc.ttf')
+showtext_auto()
+```
+
+```{r, include=FALSE}
+theme_polyvore <- function(){
+  font <- 'trebuchet'
+  
+  theme_minimal() %+replace%
+    
+    theme(
+      # grid elements
+      panel.grid.major = element_blank(),
+      panel.grid.minor = element_blank(),
+      axis.ticks = element_blank(),
+      
+      # text elements
+      plot.title = element_text(
+        family = font,
+        size = 20,
+        face = 'bold',
+        hjust = 0,
+        vjust = 2),
+      
+      plot.subtitle = element_text(          #subtitle
+                   family = font,            #font family
+                   size = 14),               #font size
+      
+      plot.caption = element_text(           #caption
+                   family = font,            #font family
+                   size = 9,                 #font size
+                   hjust = 1),               #right align
+      
+      axis.title = element_text(             #axis titles
+                   family = font,            #font family
+                   size = 10),               #font size
+      
+      axis.text = element_text(              #axis text
+                   family = font,            #axis family
+                   size = 9),                #font size
+      
+      axis.text.x = element_text(            #margin for axis text
+                    margin=margin(5, b = 10))
+      
+
+    )
+}
 ```
 
 
-## Exploring the Data
+## Exploratory Data Analysis
 Now that we've tidied the data in a format that will be better suited for our analysis, we can begin by making some plots and seeing how the data is distributed.
 
+First we will import the data and convert the appropriate variables into categorical data.
+
 ```{r}
+# Reading the tidied data into R
 outfits <- read.csv('tidy_data.csv')
-outfits %>% head()
+
+# converting all character columns into factors
+outfits[sapply(outfits, is.character)] <- lapply(outfits[sapply(outfits, is.character)], as.factor)
+# I will only be using set_id to retrieve photos, so we will leave it be
+
+outfits %>% head(3)
 ```
 
-In the final data set, there are 14 variables
+
+In the final data set, there are 14 variables:
+
+Name | Variable description
+---|---
+`views` | The number of times an outfit has been viewed
+`likes` | The number of likes an outfit received **(the response variable)**
+`set_id` | identifies the particular outfit
+`item_1` - `item_8` | gives the name of the item type for up to 8 items in an outfit
+`color_1` - `color_4` | gives the unique colors found in the outfit for up to 4 different colors
+
+
+### Likes
+We will start by looking at the distribution of our response variable, `likes`.
+
+
+```{r}
+outfits %>% 
+  ggplot(aes(x = likes)) + 
+  geom_histogram(bins=40, fill="#3b252c") +
+  xlim(0, 1500) +
+  theme_polyvore()
+```
+
+
+
