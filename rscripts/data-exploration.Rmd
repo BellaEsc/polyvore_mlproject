@@ -25,6 +25,7 @@ knitr::opts_chunk$set(echo = TRUE, message = FALSE,
 library(tidyverse)
 library(ggplot2)
 library(extrafont)
+library(showtext)
 
 ```
 
@@ -42,17 +43,19 @@ theme_polyvore <- function(){
     
     theme(
       # grid elements
-      panel.grid.major = element_blank(),
+      #panel.grid.major = element_blank(),
       panel.grid.minor = element_blank(),
       axis.ticks = element_blank(),
+      axis.line = element_line(),
       
       # text elements
       plot.title = element_text(
         family = font,
-        size = 20,
+        size = 24,
         face = 'bold',
         hjust = 0,
-        vjust = 2),
+        vjust = 2,
+        margin = margin(b=5, t=5)),
       
       plot.subtitle = element_text(          #subtitle
                    family = font,            #font family
@@ -65,14 +68,16 @@ theme_polyvore <- function(){
       
       axis.title = element_text(             #axis titles
                    family = font,            #font family
-                   size = 10),               #font size
+                   size = 20),               #font size
       
       axis.text = element_text(              #axis text
                    family = font,            #axis family
-                   size = 9),                #font size
+                   size = 16),                #font size
       
       axis.text.x = element_text(            #margin for axis text
-                    margin=margin(5, b = 10))
+                    margin=margin(5, b = 10)),
+      
+      axis.title.y = element_text(margin=margin(b=10, r=10), angle=90)
       
 
     )
@@ -115,10 +120,19 @@ We will start by looking at the distribution of our response variable, `likes`.
 ```{r}
 outfits %>% 
   ggplot(aes(x = likes)) + 
-  geom_histogram(bins=40, fill="#3b252c") +
-  xlim(0, 1500) +
+  geom_histogram(binwidth = 100, fill="#3b252c") +
+  labs(y = 'Number of Likes', x = 'Count', title = 'Distribution of the Number of Likes') +
+  coord_cartesian(xlim = c(0, 4000)) +
   theme_polyvore()
 ```
 
+We can see from this plot that the number of likes ranges from 0 to around 3000, and that the number of outfits decreases exponentially as the number of likes goes up. This follows the sort of logic you'd expect, where a select few get lots of likes while most go unseen.
 
+### Item 1
+Looking at the data, we can see that `item_1` is generally the primary item of the outfit. This can be inferred by the types of items seen in this category: shirts, dresses, coats, etc. The importance of the item in the outfit goes down as the item goes up. We can see this by looking at the frequency of items in each slot.
+
+```{r}
+item1_t10 <- (sort(table(outfits$item_1), decreasing = TRUE) %>% names)[1:10]
+outfits_item1_top10 <- outfits[outfits$item_1 %in% item1_t10,]
+```
 
