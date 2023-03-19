@@ -128,11 +128,37 @@ outfits %>%
 
 We can see from this plot that the number of likes ranges from 0 to around 3000, and that the number of outfits decreases exponentially as the number of likes goes up. This follows the sort of logic you'd expect, where a select few get lots of likes while most go unseen.
 
-### Item 1
-Looking at the data, we can see that `item_1` is generally the primary item of the outfit. This can be inferred by the types of items seen in this category: shirts, dresses, coats, etc. The importance of the item in the outfit goes down as the item goes up. We can see this by looking at the frequency of items in each slot.
+### Items (Clothing Articles)
+Looking at the data, we can see that `item_1` is generally the primary item of the outfit. This can be inferred by the types of items seen in this category: shirts, dresses, coats, etc. We can confirm this by looking at the frequency of items in `item_1`.
+
+```{r}
+# Finds the number of unique items in item_1 column
+outfits$item_1 %>% unique() %>% length()
+```
+```{r}
+outfits %>% ggplot(aes(x = fct_infreq(item_1))) +
+  geom_bar(fill = '#F08080') +
+  labs(x = 'Item 1', title = 'Frequencies of item_1 Items') +
+  theme_polyvore() +
+  theme(axis.text.x = element_blank(), 
+        panel.grid.major.x = element_blank(), 
+        axis.line = element_blank())
+```
+
+From this plot, we can see that there are some items that are repeated a lot in the `item_1` slot, whereas others are more rare. Since there are 229 unique items present in this column, I've suppressed the item name text so that we can see the distribution better. 
+
+To get a better look at the most frequent items seen in this slot, we will look at a bar plot of the top 10 `item_1` items by frequency.
 
 ```{r}
 item1_t10 <- (sort(table(outfits$item_1), decreasing = TRUE) %>% names)[1:10]
 outfits_item1_top10 <- outfits[outfits$item_1 %in% item1_t10,]
+
+outfits_item1_top10 %>% 
+  ggplot(aes(x = fct_infreq(item_1))) +
+  geom_bar(fill="#2c514c") +
+  labs(x = 'Item 1', title = 'Frequencies of Top 10 item_1 Items') +
+  theme_polyvore() +
+  theme(axis.text.x = element_text(margin=margin(b = 10), size = 12),
+        axis.line = element_blank())
 ```
 
