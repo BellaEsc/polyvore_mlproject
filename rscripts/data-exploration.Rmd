@@ -8,6 +8,7 @@ output:
     toc: true
     toc_float: true
     code_folding: show
+    df_print: paged
 ---
 
 <style type = "text/css">
@@ -15,7 +16,7 @@ output:
   font-family: trebuchet ms, sans-serif;
 }
 .list-group-item.active, .list-group-item.active:focus, .list-group-item.active:hover {
-    background-color: lightcoral;
+    background-color: #8A5667;
 }
 </style>
 
@@ -26,6 +27,7 @@ library(tidyverse)
 library(ggplot2)
 library(extrafont)
 library(showtext)
+library(gt)
 
 ```
 
@@ -98,7 +100,7 @@ outfits <- read.csv('tidy_data.csv')
 outfits[sapply(outfits, is.character)] <- lapply(outfits[sapply(outfits, is.character)], as.factor)
 # I will only be using set_id to retrieve photos, so we will leave it be
 
-outfits %>% head(3)
+outfits %>% head(5)
 ```
 
 
@@ -120,21 +122,23 @@ We will start by looking at the distribution of our response variable, `likes`.
 ```{r}
 outfits %>% 
   ggplot(aes(x = likes)) + 
-  geom_histogram(binwidth = 100, fill="#3b252c") +
-  labs(y = 'Number of Likes', x = 'Count', title = 'Distribution of the Number of Likes') +
+  geom_histogram(binwidth = 100, fill="#2C514C") +
+  labs(x = 'Number of Likes', y = 'Count', title = 'Distribution of the Number of Likes') +
   coord_cartesian(xlim = c(0, 4000)) +
   theme_polyvore()
 ```
 
-We can see from this plot that the number of likes ranges from 0 to around 3000, and that the number of outfits decreases exponentially as the number of likes goes up. This follows the sort of logic you'd expect, where a select few get lots of likes while most go unseen.
+The number of likes ranges from 0 to around 3000, and the frequency decreases exponentially as the number of likes goes up. This follows the sort of logic you'd expect, where a select few get lots of likes while most go unseen.
 
 ### Items (Clothing Articles)
-Looking at the data, we can see that `item_1` is generally the primary item of the outfit. This can be inferred by the types of items seen in this category: shirts, dresses, coats, etc. We can confirm this by looking at the frequency of items in `item_1`.
+After an initial survey of the raw data, I noted that there were a lot of different item ids.
 
 ```{r}
 # Finds the number of unique items in item_1 column
 outfits$item_1 %>% unique() %>% length()
 ```
+And indeed, there are 229 unique items in `item_1` alone! To further examine the nature of the item columns, we will look at a plot of the item frequencies in `item_1`.
+
 ```{r}
 outfits %>% ggplot(aes(x = fct_infreq(item_1))) +
   geom_bar(fill = '#F08080') +
@@ -155,10 +159,59 @@ outfits_item1_top10 <- outfits[outfits$item_1 %in% item1_t10,]
 
 outfits_item1_top10 %>% 
   ggplot(aes(x = fct_infreq(item_1))) +
-  geom_bar(fill="#2c514c") +
+  geom_bar(fill="#583742") +
   labs(x = 'Item 1', title = 'Frequencies of Top 10 item_1 Items') +
   theme_polyvore() +
-  theme(axis.text.x = element_text(margin=margin(b = 10), size = 12),
+  theme(axis.text.x = element_text(size = 14, angle = 45),
         axis.line = element_blank())
 ```
 
+We can see from this plot that tops, sweaters, and day dresses are the most frequent items in the item_1 slot. The rest are similar; they are either tops or jackets. To get a better idea of what the other item columns look like, we'll construct a table with the top 5 items by frequency in each item column. 
+
+```{r, class.source = 'fold-hide'}
+item1_t5 <- (sort(table(outfits$item_1), decreasing = TRUE) %>% names)[1:5]
+item2_t5 <- (sort(table(outfits$item_2), decreasing = TRUE) %>% names)[1:5]
+item3_t5 <- (sort(table(outfits$item_3), decreasing = TRUE) %>% names)[1:5]
+item4_t5 <- (sort(table(outfits$item_4), decreasing = TRUE) %>% names)[1:5]
+item5_t5 <- (sort(table(outfits$item_5), decreasing = TRUE) %>% names)[1:5]
+item6_t5 <- (sort(table(outfits$item_6), decreasing = TRUE) %>% names)[1:5]
+item7_t5 <- (sort(table(outfits$item_7), decreasing = TRUE) %>% names)[1:5]
+item8_t5 <- (sort(table(outfits$item_8), decreasing = TRUE) %>% names)[1:5]
+
+item_freq_table <- data.frame(item_1 = item1_t5,
+                              item_2 = item2_t5,
+                              item_3 = item3_t5,
+                              item_4 = item4_t5,
+                              item_5 = item5_t5,
+                              item_6 = item6_t5,
+                              item_7 = item7_t5,
+                              item_8 = item8_t5)
+
+```
+
+```{r}
+item_freq_table %>% gt() %>% 
+  tab_header(
+    title = "Top 5 Items by Frequency"
+  )
+```
+
+From looking at both the raw data and this table, a general pattern emerges: within each outfit, the items are sorted from most to least significant, with `item_1` being the most significant item and `item_8` being the least. The top items in `item_2` are still significant, with jackets being the most frequent and "bottoms" being common elements as well (shorts, jeans, skirts). `item_3` dips into shoe territory, and `item_4` through `item_8` can be seen mostly as the "accessory section". Another thing that is interesting to note from the table is that from `item_5` and onward, *"None" is the most frequent item*. We can check the proportion of "None"s pretty easily.
+
+```{r}
+# Gets proportion of data that has fewer than 5 items, fewer than 6 items, fewer than 7 items, and fewer than 8 items
+props <- c(((filter(outfits, item_4 == 'None') %>% count()) / (outfits %>% count()))[1,1] %>% as.numeric(),
+((filter(outfits, item_5 == 'None') %>% count()) / (outfits %>% count()))[1,1] %>% as.numeric(),
+((filter(outfits, item_6 == 'None') %>% count()) / (outfits %>% count()))[1,1] %>% as.numeric(),
+((filter(outfits, item_7 == 'None') %>% count()) / (outfits %>% count()))[1,1] %>% as.numeric(),
+((filter(outfits, item_8 == 'None') %>% count()) / (outfits %>% count()))[1,1] %>% as.numeric())
+props
+```
+
+With some simple arithmetic, this gives us a breakdown of the item number proportions:
+
+* 8% of the outfits have 4 items,
+* 15% have 5 items,
+* 17% have 6 items,
+* 19% have 7 items, and
+* 41% have 8 items
