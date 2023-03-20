@@ -213,7 +213,23 @@ With some simple arithmetic, this gives us a breakdown of the item number propor
 * 19% have 7 items, and
 * 41% have 8 items
 
-Now we want to see what relationship the items have with likes. Before doing so, I will transform the data so that we have 10 
+Now we want to see what relationship the items have with likes. Before doing so, I will transform the data so that we only have 10 different categories, which will be the top 9 occurrences plus another category, 'other'.
+
+```{r}
+outfits2 <- outfits %>% mutate(item_1 = fct_lump_n(outfits$item_1, n=9))
+colors <- c('#335C57', '#583742', '#F08080',
+             '#335C57', '#583742', '#F08080',
+             '#335C57', '#583742', '#F08080',
+             '#335C57')
+outfits2 %>% 
+  ggplot(aes(x=likes, y=item_1, group=item_1, alpha=0.9)) +
+  geom_boxplot(fill = colors) +
+  scale_x_continuous(limits = c(0, 600)) +
+  theme_polyvore() +
+  theme(legend.position = 'none')
+```
+
+I set the y limit for `likes` at 600 so that the boxes aren't smushed around 0 (due to the nature of how `likes` is distributed). We can see that the items that yield more likes are sweaters and day dresses, while tank pops are the least popular of the category. 
 
 ### Colors
 All of us understand that color plays an essential role in whether or not an outfit "works" (unless you're doing wardrobe for a 1947 film noir), so it will be interesting to see what kind of colors are represented in the data.
@@ -277,6 +293,18 @@ Red clearly reigns supreme for `color_1`, followed by blue, white, and black. We
 
 Next, we'll take a look at the relationship between color and likes. 
 
+```{r}
+colors <- c('gray16', '#4a687d', '#643b34',
+            '#9b938c', '#628d55', '#e3774c', '#6e4258',
+            '#fb5c5c', '#ffdfbf', '#e2ba59')
+            
+outfits %>% 
+  ggplot(aes(x=likes, y=color_1, group=color_1)) +
+  geom_boxplot(fill=colors) +
+  theme_polyvore()
+```
+
+All of the colors have their distribution of likes concentrated around 0 which makes sense when considering the distribution of the number of likes. The main differences we see come from the spread 
 
 ### Relationship between Items and Likes
 Now that we have a good idea of what the different item columns hold, we can examine the items' relationship with the number of likes an outfit receives.
