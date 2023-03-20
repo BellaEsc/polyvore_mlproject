@@ -139,36 +139,31 @@ After an initial survey of the raw data, I noted that there were a lot of differ
 # Finds the number of unique items in item_1 column
 outfits$item_1 %>% unique() %>% length()
 ```
-And indeed, there are 229 unique items in `item_1` alone! To further examine the nature of the item columns, we will look at a plot of the item frequencies in `item_1`.
+And indeed, there are 229 unique items in `item_1` alone! To further examine the nature of the item columns, we will look at a plot of the item frequencies in `item_1`. Additionally, we'll do a "zoom in" of the top 10 items by frequency in `item_1`.
 
 ```{r}
 outfits %>% ggplot(aes(x = fct_infreq(item_1))) +
   geom_bar(fill = '#F08080') +
-  labs(x = 'Item 1', title = 'Frequencies of item_1 Items') +
+  labs(x = 'Item 1', y='', title = 'Frequencies of item_1 Items') +
   theme_polyvore() +
   theme(axis.text.x = element_blank(), 
         panel.grid.major.x = element_blank(), 
-        axis.line = element_blank())
-```
+        axis.line = element_blank()) -> p1
 
-From this plot, we can see that there are some items that are repeated a lot in the `item_1` slot, whereas others are more rare. Since there are 229 unique items present in this column, I've suppressed the item name text so that we can see the distribution better. 
-
-To get a better look at the most frequent items seen in this slot, we will look at a bar plot of the top 10 `item_1` items by frequency.
-
-```{r}
 item1_t10 <- (sort(table(outfits$item_1), decreasing = TRUE) %>% names)[1:10]
 outfits_item1_top10 <- outfits[outfits$item_1 %in% item1_t10,]
 
 outfits_item1_top10 %>% 
-  ggplot(aes(x = fct_infreq(item_1))) +
+  ggplot(aes(y = fct_infreq(item_1))) +
   geom_bar(fill="#583742") +
-  labs(x = 'Item 1', title = 'Frequencies of Top 10 item_1 Items') +
+  labs(x = '', y='', title = 'Top 10 item_1 Items') +
   theme_polyvore() +
-  theme(axis.text.x = element_text(size = 14, angle = 45),
-        axis.line = element_blank())
+  theme(axis.line = element_blank()) -> p2
+
+grid.arrange(p1, p2, ncol=2)
 ```
 
-We can see from this plot that tops, sweaters, and day dresses are the most frequent items in the item_1 slot. The rest are similar; they are either tops, jackets, or dresses. To get a better idea of what the other item columns look like, we'll construct a table with the top 5 items by frequency in each item column. 
+The first plot shows that occurrences of the 229 items in `item_1` are concentrated towards the top few items and fall off significantly after. We can see from the second plot that the top items of `item_1` are all tops, dresses, and jackets of some type. This similarity gives us an idea of how the items have been organized, and we can get a better picture from constructing a table.
 
 ```{r}
 item1_t5 <- (sort(table(outfits$item_1), decreasing = TRUE) %>% names)[1:5]
@@ -217,6 +212,8 @@ With some simple arithmetic, this gives us a breakdown of the item number propor
 * 17% have 6 items,
 * 19% have 7 items, and
 * 41% have 8 items
+
+Now we want to see what relationship the items have with likes. Before doing so, I will transform the data so that we have 10 
 
 ### Colors
 All of us understand that color plays an essential role in whether or not an outfit "works" (unless you're doing wardrobe for a 1947 film noir), so it will be interesting to see what kind of colors are represented in the data.
@@ -277,6 +274,8 @@ grid.arrange(p1, p2, p3, p4, ncol=2)
 The color columns are similar to the item columns in the way they are ordered: `color_1` will have higher importance than `color_2` (and so on) in the outfit due to the way the information was extracted. This gives us some insight into the colors represented in these charts.
 
 Red clearly reigns supreme for `color_1`, followed by blue, white, and black. We start to see "none" dominate starting in `color_2`, indicating that there are lots of outfits for which only one color could be extracted (or simply had a monochromatic scheme going on). In `color_4`, we see that most of the outfits simply don't have a color entry. This could mean that most outfits stuck to 1-3 colors.
+
+Next, we'll take a look at the relationship between color and likes. 
 
 
 ### Relationship between Items and Likes
