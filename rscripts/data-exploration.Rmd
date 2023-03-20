@@ -28,6 +28,8 @@ library(ggplot2)
 library(extrafont)
 library(showtext)
 library(gt)
+library(grid)
+library(gridExtra)
 
 ```
 
@@ -53,7 +55,7 @@ theme_polyvore <- function(){
       # text elements
       plot.title = element_text(
         family = font,
-        size = 24,
+        size = 28,
         face = 'bold',
         hjust = 0,
         vjust = 2,
@@ -166,7 +168,7 @@ outfits_item1_top10 %>%
         axis.line = element_blank())
 ```
 
-We can see from this plot that tops, sweaters, and day dresses are the most frequent items in the item_1 slot. The rest are similar; they are either tops or jackets. To get a better idea of what the other item columns look like, we'll construct a table with the top 5 items by frequency in each item column. 
+We can see from this plot that tops, sweaters, and day dresses are the most frequent items in the item_1 slot. The rest are similar; they are either tops, jackets, or dresses. To get a better idea of what the other item columns look like, we'll construct a table with the top 5 items by frequency in each item column. 
 
 ```{r, class.source = 'fold-hide'}
 item1_t5 <- (sort(table(outfits$item_1), decreasing = TRUE) %>% names)[1:5]
@@ -196,7 +198,7 @@ item_freq_table %>% gt() %>%
   )
 ```
 
-From looking at both the raw data and this table, a general pattern emerges: within each outfit, the items are sorted from most to least significant, with `item_1` being the most significant item and `item_8` being the least. The top items in `item_2` are still significant, with jackets being the most frequent and "bottoms" being common elements as well (shorts, jeans, skirts). `item_3` dips into shoe territory, and `item_4` through `item_8` can be seen mostly as the "accessory section". Another thing that is interesting to note from the table is that from `item_5` and onward, *"None" is the most frequent item*. We can check the proportion of "None"s pretty easily.
+From looking at both the raw data and this table, a general pattern emerges: within each outfit, the items are sorted from most to least significant, with `item_1` being the most significant item and `item_8` being the least. The top items in `item_2` are still significant, with jackets being the most frequent and "bottoms" being common elements as well (shorts, jeans, skirts). `item_3` dips into shoe territory, and `item_4` through `item_8` can be seen mostly as the "accessory section". Another thing that is interesting to note from the table is that from `item_5` and onward, "None" is the most frequent item. We can check the proportion of "None"s pretty easily.
 
 ```{r}
 # Gets proportion of data that has fewer than 5 items, fewer than 6 items, fewer than 7 items, and fewer than 8 items
@@ -215,3 +217,44 @@ With some simple arithmetic, this gives us a breakdown of the item number propor
 * 17% have 6 items,
 * 19% have 7 items, and
 * 41% have 8 items
+
+### Colors
+All of us understand that color plays an essential role in whether or not an outfit "works" (unless you're doing wardrobe for a 1947 film noir), so it will be good to see what kind of colors are represented in the data.
+
+The color columns are similar to the item columns in the way they are ordered: `color_1` will have higher importance than `color_2` (and so on) in the outfit due to the way the information was extracted. Thus, we will look at the most popular colors in the `color_1` column.
+
+```{r}
+colors1 <- c('#fb5c5c', '#4a687d', '#ffdfbf',
+            'gray16', '#9b938c', '#e2ba59', '#628d55',
+            '#643b34', '#e3774c', '#6e4258')
+
+outfits %>% 
+  ggplot(aes(x = fct_infreq(color_1))) +
+  geom_bar(fill = colors1) +
+  labs(x = 'Color', title = 'Frequencies of Colors in color_1') +
+  theme_polyvore() -> p1
+
+colors2 <- c('gray16', '#4e4c5e', '#ffdfbf', '#e2ba59',
+             '#9b938c', '#643b34', '#4a687d', '#628d55',
+             '#fb5c5c', '#e3774c', '#6e4258')
+
+outfits %>% 
+  ggplot(aes(x = fct_infreq(color_2))) +
+  geom_bar(fill = colors2) +
+  labs(x = 'Color', title = 'Frequencies of Colors in color_2') +
+  theme_polyvore() -> p2
+
+grid.arrange(p1, p2, ncol=2)
+
+```
+
+
+Red clearly reigns supreme for `color_1`, followed by blue, white, and black. 
+
+
+### Relationship between Items and Likes
+Now that we have a good idea of what the different item columns hold, we can examine the items' relationship with the number of likes an outfit receives.
+
+
+
+
