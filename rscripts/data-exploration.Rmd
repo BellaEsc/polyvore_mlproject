@@ -7,7 +7,7 @@ output:
   html_document:
     toc: true
     toc_float: true
-    code_folding: show
+    code_folding: hide
     df_print: paged
 ---
 
@@ -92,7 +92,7 @@ theme_polyvore <- function(){
 ## Exploratory Data Analysis
 Now that we've tidied the data in a format that will be better suited for our analysis, we can begin by making some plots and seeing how the data is distributed.
 
-First we will import the data and convert the appropriate variables into categorical data.
+First we will import the data and convert the appropriate variables into factors.
 
 ```{r}
 # Reading the tidied data into R
@@ -135,7 +135,7 @@ The number of likes ranges from 0 to around 3000, and the frequency decreases ex
 ### Items (Clothing Articles)
 After an initial survey of the raw data, I noted that there were a lot of different item ids.
 
-```{r}
+```{r, class.source = 'fold-show'}
 # Finds the number of unique items in item_1 column
 outfits$item_1 %>% unique() %>% length()
 ```
@@ -170,7 +170,7 @@ outfits_item1_top10 %>%
 
 We can see from this plot that tops, sweaters, and day dresses are the most frequent items in the item_1 slot. The rest are similar; they are either tops, jackets, or dresses. To get a better idea of what the other item columns look like, we'll construct a table with the top 5 items by frequency in each item column. 
 
-```{r, class.source = 'fold-hide'}
+```{r}
 item1_t5 <- (sort(table(outfits$item_1), decreasing = TRUE) %>% names)[1:5]
 item2_t5 <- (sort(table(outfits$item_2), decreasing = TRUE) %>% names)[1:5]
 item3_t5 <- (sort(table(outfits$item_3), decreasing = TRUE) %>% names)[1:5]
@@ -219,9 +219,7 @@ With some simple arithmetic, this gives us a breakdown of the item number propor
 * 41% have 8 items
 
 ### Colors
-All of us understand that color plays an essential role in whether or not an outfit "works" (unless you're doing wardrobe for a 1947 film noir), so it will be good to see what kind of colors are represented in the data.
-
-The color columns are similar to the item columns in the way they are ordered: `color_1` will have higher importance than `color_2` (and so on) in the outfit due to the way the information was extracted. Thus, we will look at the most popular colors in the `color_1` column.
+All of us understand that color plays an essential role in whether or not an outfit "works" (unless you're doing wardrobe for a 1947 film noir), so it will be interesting to see what kind of colors are represented in the data.
 
 ```{r}
 colors1 <- c('#fb5c5c', '#4a687d', '#ffdfbf',
@@ -229,27 +227,56 @@ colors1 <- c('#fb5c5c', '#4a687d', '#ffdfbf',
             '#643b34', '#e3774c', '#6e4258')
 
 outfits %>% 
-  ggplot(aes(x = fct_infreq(color_1))) +
+  ggplot(aes(y = fct_infreq(color_1))) +
   geom_bar(fill = colors1) +
-  labs(x = 'Color', title = 'Frequencies of Colors in color_1') +
-  theme_polyvore() -> p1
+  labs(x = '', y = '', title = 'Frequencies of Colors in color_1') +
+  theme_polyvore() +
+  theme(axis.line = element_blank(),
+        panel.grid.major = element_blank()) -> p1
 
 colors2 <- c('gray16', '#4e4c5e', '#ffdfbf', '#e2ba59',
              '#9b938c', '#643b34', '#4a687d', '#628d55',
              '#fb5c5c', '#e3774c', '#6e4258')
 
 outfits %>% 
-  ggplot(aes(x = fct_infreq(color_2))) +
+  ggplot(aes(y = fct_infreq(color_2))) +
   geom_bar(fill = colors2) +
-  labs(x = 'Color', title = 'Frequencies of Colors in color_2') +
-  theme_polyvore() -> p2
+  labs(x = '', y = '', title = 'Frequencies of Colors in color_2') +
+  theme_polyvore() +
+  theme(axis.line = element_blank(),
+        panel.grid.major = element_blank()) -> p2
 
-grid.arrange(p1, p2, ncol=2)
+colors3 <- c('#4e4c5e', 'gray16', '#ffdfbf', '#e2ba59',
+             '#9b938c', '#643b34', '#4a687d', '#6e4258',
+             '#fb5c5c', '#628d55', '#e3774c')
+
+outfits %>% 
+  ggplot(aes(y = fct_infreq(color_3))) +
+  geom_bar(fill = colors3) +
+  labs(x = '', y = '', title = 'Frequencies of Colors in color_3') +
+  theme_polyvore() +
+  theme(axis.line = element_blank(),
+        panel.grid.major = element_blank()) -> p3
+
+colors4 <- c('#4e4c5e', 'gray16', '#9b938c', '#fb5c5c',
+             '#e2ba59', '#4a687d', '#ffdfbf', '#6e4258',
+             '#e3774c', '#643b34', '#628d55')
+
+outfits %>% 
+  ggplot(aes(y = fct_infreq(color_4))) +
+  geom_bar(fill = colors4) +
+  labs(x = '', y = '', title = 'Frequencies of Colors in color_4') +
+  theme_polyvore() +
+  theme(axis.line = element_blank(),
+        panel.grid.major = element_blank()) -> p4
+
+grid.arrange(p1, p2, p3, p4, ncol=2)
 
 ```
 
+The color columns are similar to the item columns in the way they are ordered: `color_1` will have higher importance than `color_2` (and so on) in the outfit due to the way the information was extracted. This gives us some insight into the colors represented in these charts.
 
-Red clearly reigns supreme for `color_1`, followed by blue, white, and black. 
+Red clearly reigns supreme for `color_1`, followed by blue, white, and black. We start to see "none" dominate starting in `color_2`, indicating that there are lots of outfits for which only one color could be extracted (or simply had a monochromatic scheme going on). In `color_4`, we see that most of the outfits simply don't have a color entry. This could mean that most outfits stuck to 1-3 colors.
 
 
 ### Relationship between Items and Likes
