@@ -540,14 +540,16 @@ load("tunings/boosted_tune.rda")
 
 **BAM!** Models are tuned!* We now want to find the root mean square error (RMSE) for each model. The RMSE is a measure of the differences between predicted values and actual values, so this will be useful in comparing the models' performances. 
 
-\* Linear regression hasn't been tuned since there it doesn't have tuning parameters... I bet he feels so alone right now... It's okay though. He will still be fit.
+\* *Linear regression hasn't been tuned since it doesn't have tuning parameters... I bet he feels so alone right now... It's okay though. He will still be fit.*
 
 ```{r, eval=FALSE}
 lm_fit <- fit_resamples(lm_wflow, resamples = outfits_fold)
 save(lm_fit, file = "tunings/lm_fit.rda")
 ```
 
-Now we can look at the performance of the model on the training data. First, we'll look at the RMSE and then we'll look at the autoplots of the tuned model.
+
+### Training Performance
+Now we can look at the performance of the model on the training data. First, we'll look at the RMSE and then we'll look at some of the autoplots of the tuned model.
 
 ```{r}
 load("tunings/lm_fit.rda")
@@ -566,7 +568,7 @@ rmse_table <- data.frame('Linear Regression' = lm_rmse,
                          'KNN' = knn_rmse,
                          'Elastic' = elastic_rmse,
                          'Random Forest' = rf_rmse,
-                         'Boosted Tree' = boosted_rmse)
+                         'Boosted Trees' = boosted_rmse)
 
 rmse_table %>% gt() %>% 
   tab_header(
@@ -575,25 +577,29 @@ rmse_table %>% gt() %>%
 ```
 
 ```{r}
-autoplot(knn_tune, metric='rmse') + theme_polyvore() -> p1
-
-autoplot(elastic_tune, metric='rmse') + theme_polyvore() -> p2
-
-autoplot(rf_tune, metric='rmse') + theme_polyvore() -> p3
-
-autoplot(boosted_tune, metric='rmse') + theme_polyvore() -> p4
-
-grid.arrange(p1, p2, p3, p4, ncol=2)
+autoplot(elastic_tune, metric='rmse') +
+  labs(title='Elastic') +
+  theme_polyvore()
 ```
+
+We can see from the elastic net model that having a lasso penalty of 1 and a mixture of 1 gives the best results. What this means is that the model that performed the best was a lasso regression.
 
 
 ```{r}
-
+autoplot(rf_tune, metric='rmse') +
+  labs(title='Random Forest') +
+  theme_polyvore()
 ```
+The autoplot for the random forest tells us that 100 trees with mtry=4 seems to have the best performance. This makes sense, as having more trees gives the model more flexibility which would be helpful in the case where there are a lot of predictors and categories within those predictors.
 
 ```{r}
-
+autoplot(boosted_tune, metric='rmse') +
+  labs(title='Boosted Trees') +
+  theme_polyvore()
 ```
+
+We can see in the boosted tree metrics that the learning rate of 0.1 worked the best by far, and having 100 trees was also the best, though the change between the number of trees is not very dramatic. This indicates that a faster learning rate was beneficial for the model.
+
 
 
 
