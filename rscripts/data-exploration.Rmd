@@ -30,7 +30,7 @@ library(showtext)
 library(gt)
 library(grid)
 library(gridExtra)
-
+library(tidymodels)
 ```
 
 ```{r, include=FALSE}
@@ -221,15 +221,26 @@ colors <- c('#335C57', '#583742', '#F08080',
              '#335C57', '#583742', '#F08080',
              '#335C57', '#583742', '#F08080',
              '#335C57')
+             
 outfits2 %>% 
-  ggplot(aes(x=likes, y=item_1, group=item_1, alpha=0.9)) +
+  ggplot(aes(x=likes, y=item_1, group=item_1)) +
+  geom_boxplot(fill = colors) +
+  labs(y = '', title = 'Boxplot of item_1') +
+  theme_polyvore() +
+  theme(axis.title.y = element_blank()) -> p1
+
+outfits2 %>% 
+  ggplot(aes(x=likes, y=item_1, group=item_1)) +
   geom_boxplot(fill = colors) +
   scale_x_continuous(limits = c(0, 600)) +
+  labs(y = '', title = 'Boxplot of item_1 (zoomed)') +
   theme_polyvore() +
-  theme(legend.position = 'none')
+  theme(axis.title.y = element_blank()) -> p2
+
+grid.arrange(p1, p2, ncol = 2)
 ```
 
-I set the y limit for `likes` at 600 so that the boxes aren't smushed around 0 (due to the nature of how `likes` is distributed). We can see that the items that yield more likes are sweaters and day dresses, while tank pops are the least popular of the category. 
+In the first boxplot, we can see the full range of likes. It's hard to glean any information from the boxes themselves, but we can see differences in the spread of outliers for each category. In the second boxplot, I've "zoomed in" by limiting the x axis so we can see the boxes better. We can see here that sweaters and day dresses have the highest average number of likes, while tank tops trail behind all of the other categories.
 
 ### Colors
 All of us understand that color plays an essential role in whether or not an outfit "works" (unless you're doing wardrobe for a 1947 film noir), so it will be interesting to see what kind of colors are represented in the data.
@@ -297,18 +308,61 @@ Next, we'll take a look at the relationship between color and likes.
 colors <- c('gray16', '#4a687d', '#643b34',
             '#9b938c', '#628d55', '#e3774c', '#6e4258',
             '#fb5c5c', '#ffdfbf', '#e2ba59')
-            
+
 outfits %>% 
   ggplot(aes(x=likes, y=color_1, group=color_1)) +
   geom_boxplot(fill=colors) +
-  theme_polyvore()
+  labs(title = 'Boxplot of color_1') +
+  theme_polyvore() +
+  theme(axis.title.y = element_blank()) -> p1
+
+outfits %>% 
+  ggplot(aes(x=likes, y=color_1, group=color_1)) +
+  geom_boxplot(fill=colors) +
+  scale_x_continuous(limits = c(0, 500)) + 
+  labs(title = 'Boxplot of color_1 (zoomed)') +
+  theme_polyvore() + 
+  theme(axis.title.y = element_blank()) -> p2
+
+grid.arrange(p1, p2, ncol=2)
 ```
 
-All of the colors have their distribution of likes concentrated around 0 which makes sense when considering the distribution of the number of likes. The main differences we see come from the spread 
+The left graph shows similar behavior as the `item_1` boxplot, with all of the colors being concentrated near zero but having different spreads of outliers into the higher numbers of likes. On the right boxplot, we can see that orange has the highest number of average likes, while red and blue are towards the low end. This is interesting since red and blue were the most frequent colors and orange was the second least frequent, so this could potentially mean that being less common gives outfits with orange a slight edge.
 
-### Relationship between Items and Likes
-Now that we have a good idea of what the different item columns hold, we can examine the items' relationship with the number of likes an outfit receives.
+## Fitting Models
+With the information gathered from the exploratory data analysis, we can start fitting models. There are a few key steps in fitting a model:
+
+* Split the data into training and testing
+* Specify a recipe for the model to use
+* Create a workflow for the model
+* Do any tuning necessary
+* Fit training data to the model(s)
+* Fit best model to the testing data based off of training performance metrics
+
+Regression models will be used for this case because the response variable, `likes`, is numeric (we also have an interesting situation where all of our predictors are categorical). Because there are so many different categories in the item columns, this could lead to a problem of overfitting. For now, we will keep each of these columns to 10 categories.
+
+ ### Splitting the Data
+
+Without further ado, we will start by splitting our data into training and testing. I've decided to split it into 70% training and 30% testing, stratifying on the `likes` variable. This ensures that the training and testing have the same distribution of likes.
+
+```{r}
+# Setting each item category to the top 9 categories, the rest will be "other"
+outfits <- outfits %>% 
+  mutate(item_1 = fct_lump_n(outfits$item_1, n=9), 
+         item_2 = fct_lump_n(outfits$item_2, n=9), 
+         item_3 = fct_lump_n(outfits$item_3, n=9), 
+         item_4 = fct_lump_n(outfits$item_4, n=9), 
+         item_5 = fct_lump_n(outfits$item_5, n=9), 
+         item_6 = fct_lump_n(outfits$item_6, n=9), 
+         item_7 = fct_lump_n(outfits$item_7, n=9), 
+         item_8 = fct_lump_n(outfits$item_8, n=9))
+
+set.seed(222)
+outfits_split <- initial_split(outfits, prop=.70,
+                               strata=likes)
+outfits_train <- training(outfits_split)
+outfits_test <- testing(outfits_split)
+```
 
 
-
-
+### Creating a Recipe
