@@ -18,6 +18,26 @@ output:
 .list-group-item.active, .list-group-item.active:focus, .list-group-item.active:hover {
     background-color: #8A5667;
 }
+a:link {
+  color: #F4A4A4;
+  background-color: transparent;
+  text-decoration: none;
+}
+
+a:visited {
+  color: #714753;
+  background-color: transparent;
+  text-decoration: none;
+}
+
+a:hover {
+  color: #682735;
+  background-color: transparent;
+  text-decoration: underline;
+}
+
+
+}
 </style>
 
 ```{r setup, include=FALSE}
@@ -450,13 +470,13 @@ The models that we will be using for this data, as mentioned before, will be reg
 
 * **Linear regression**
   * The simplest of the models. Estimates a linear relationship between the predictors and the response, then uses that estimate to make a prediction. 
-* Elastic net 
+* **Elastic net** 
   * Similar to linear regression, but adds a "penalty" on the number of predictors. It's elastic because it can do a combination of two different penalties, ridge and LASSO.
-* K-nearest neighbors
+* **K-nearest neighbors**
   * Makes predictions by finding the k nearest values, and then takes their average as the prediction
-* Random Forest
+* **Random Forest**
   * Combines multiple decision trees and takes the average of their outcomes to make a decision. Each decision tree arrives at a value by making different splits, such as "is the first color red?" "is item 1 a jacket?" "is the second item skinny jeans?" and then based off of that information it will take an average of the group it ends up in, say 265 likes. In a forest, the trees will ask different questions which allows for a less biased overall answer.
-* Boosted Trees
+* **Boosted Trees**
   * Makes predictions by iterating through multiple small/weak trees before arriving at the final prediction
 
 First, we will set up the models. You'll notice that some of the models have tune() included in some of the parameters. This allows us to tune that parameter to find the value that produces the best predictions.
