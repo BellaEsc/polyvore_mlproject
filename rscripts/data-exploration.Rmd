@@ -353,7 +353,7 @@ Regression models will be used for this case because the response variable, `lik
 
 Without further ado, we will start by splitting our data into training and testing. I've decided to split it into 70% training and 30% testing, stratifying on the `likes` variable. This ensures that the training and testing have the same distribution of likes.
 
-```{r}
+```{r, lass.source = 'fold-show'}
 # Setting each item category to the top 9 categories, the rest will be "other"
 outfits <- outfits %>% 
   mutate(item_1 = fct_lump_n(outfits$item_1, n=9), 
@@ -376,7 +376,7 @@ outfits_test <- testing(outfits_split)
 ### Creating a Recipe
 The next step is to make a recipe that our models will use to fit the data. In our case, this is pretty analogous to constructing an outfit. Which colors should I include and how many? Should I wear a coat? What about boots? We can get this information from `item_1` through `item_8` and `color_1` through `color_4`. I'm excluding `views` because even though it's probably a good predictor, it isn't really something you consider when picking out an outfit. 
 
-```{r}
+```{r, class.source = 'fold-show'}
 outfit_recipe <- recipe(likes ~ item_1 + item_2 + item_3 + item_4 +
                           item_5 + item_6 + item_7 + item_8 +
                           color_1 + color_2 + color_3 + color_4,
@@ -390,7 +390,7 @@ I've also decided to include an interaction term between `color_1` and `color_2`
 ### K-Fold Cross Validation
 For our project, we will be using k-fold cross validation with a *k* value of 3, which is a process that splits up the training data into k different groups and then chooses one as the validation group, then fits the model using the rest of the groups as training, repeating the process *k* times. This process is useful since it produces less variance in the estimates of the model's performance.
 
-```{r}
+```{r, class.source = 'fold-show'}
 set.seed(222)
 outfits_fold <- vfold_cv(outfits_train, v=10)
 ```
@@ -406,7 +406,7 @@ The models that we will be using for this data, as mentioned before, will be reg
 
 First, we will set up the models.
 
-```{r}
+```{r, class.source = 'fold-show'}
 # Linear Model
 lm_model <- linear_reg() %>% 
   set_engine("lm")
@@ -443,7 +443,7 @@ boosted_model <- boost_tree(trees = tune(),
 
 Next, we will set up the workflows for each model.
 
-```{r}
+```{r, class.source = 'fold-show'}
 lm_wflow <- workflow() %>% 
   add_model(lm_model) %>% 
   add_recipe(outfit_recipe)
@@ -471,7 +471,7 @@ boosted_wflow <- workflow() %>%
 
 Now we'll make tuning grids for the models with tuning parameters.
 
-```{r}
+```{r, class.source = 'fold-show'}
 knn_grid <- grid_regular(neighbors(range = c(5,20)), levels = 5)
 
 
@@ -493,7 +493,7 @@ boosted_grid <- grid_regular(mtry(range = c(2, 4)),
 
 And now the part where my PC takes a minor beating: tuning.
 
-```{r, eval=FALSE}
+```{r, class.source = 'fold-show', eval=FALSE}
 knn_tune <- tune_grid(
     knn_wflow,
     resamples = outfits_fold,
@@ -538,8 +538,40 @@ load("tunings/rf_tune.rda")
 load("tunings/boosted_tune.rda")
 ```
 
-**BAM!** Models are fit!* We now want to find the root mean square error (RMSE) for each model. The RMSE is a measure of the differences between predicted values and actual values, so this will be useful in comparing the models' performances. 
+**BAM!** Models are tuned!* We now want to find the root mean square error (RMSE) for each model. The RMSE is a measure of the differences between predicted values and actual values, so this will be useful in comparing the models' performances. 
 
-\* Linear regression hasn't been fit since there was no tuning... I bet he feels so alone right now... We'll include him though, don't worry.
+\* Linear regression hasn't been tuned since there it doesn't have tuning parameters... I bet he feels so alone right now... It's okay though. He will still be fit.
+
+```{r, eval=FALSE}
+lm_fit <- fit_resamples(lm_wflow, resamples = outfits_fold)
+save(lm_fit, file = "tunings/lm_fit.rda")
+```
+
+Now we can look at the performance and 
+```{r}
+load("tunings/lm_fit.rda")
+
+lm_rmse <- collect_metrics(lm_fit)$mean[1] %>% round(2)
+
+knn_rmse <- show_best(knn_tune, n=1)$mean %>% round(2)
+
+elastic_rmse <- show_best(elastic_tune, n=1)$mean %>% round(2)
+
+rf_rmse <- show_best(rf_tune, n=1)$mean %>% round(2)
+
+boosted_rmse <- show_best(boosted_tune, n=1)$mean %>% round(2)
+
+rmse_table <- data.frame('Linear Regression' = lm_rmse,
+                         'KNN' = knn_rmse,
+                         'Elastic' = elastic_rmse,
+                         'Random Forest' = rf_rmse,
+                         'Boosted Tree' = boosted_rmse)
+
+rmse_table %>% gt() %>% 
+  tab_header(
+    title = "Best RMSE of Tuned Models"
+  )
+```
+
 
 
