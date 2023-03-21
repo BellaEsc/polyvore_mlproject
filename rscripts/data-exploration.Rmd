@@ -21,8 +21,12 @@ output:
 </style>
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE, message = FALSE,
-                      warning = FALSE, eval = TRUE)
+knitr::opts_chunk$set(
+	eval = TRUE,
+	echo = TRUE,
+	message = FALSE,
+	warning = FALSE
+)
 library(tidyverse)
 library(ggplot2)
 library(extrafont)
@@ -31,6 +35,10 @@ library(gt)
 library(grid)
 library(gridExtra)
 library(tidymodels)
+library(xgboost)
+library(kknn)
+library(doParallel)
+registerDoParallel(cores = parallel::detectCores())
 ```
 
 ```{r, include=FALSE}
@@ -139,7 +147,7 @@ After an initial survey of the raw data, I noted that there were a lot of differ
 # Finds the number of unique items in item_1 column
 outfits$item_1 %>% unique() %>% length()
 ```
-And indeed, there are 229 unique items in `item_1` alone! To further examine the nature of the item columns, we will look at a plot of the item frequencies in `item_1`. Additionally, we'll do a "zoom in" of the top 10 items by frequency in `item_1`.
+And indeed, there are **229 unique items** in `item_1` alone! To further examine the nature of the item columns, we will look at a plot of the item frequencies in `item_1`. Additionally, we'll do a "zoom in" of the top 10 items by frequency in `item_1`.
 
 ```{r}
 outfits %>% ggplot(aes(x = fct_infreq(item_1))) +
@@ -207,11 +215,11 @@ props
 
 With some simple arithmetic, this gives us a breakdown of the item number proportions:
 
-* 8% of the outfits have 4 items,
-* 15% have 5 items,
-* 17% have 6 items,
-* 19% have 7 items, and
-* 41% have 8 items
+* **8%** of the outfits have 4 items,
+* **15%** have 5 items,
+* **17%** have 6 items,
+* **19%** have 7 items, and
+* **41%** have 8 items
 
 Now we want to see what relationship the items have with likes. Before doing so, I will transform the data so that we only have 10 different categories, which will be the top 9 occurrences plus another category, 'other'.
 
@@ -377,6 +385,139 @@ outfit_recipe <- recipe(likes ~ item_1 + item_2 + item_3 + item_4 +
     step_interact(terms = ~ starts_with("color_1"):starts_with("color_2"))
 ```
 
-I've also decided to include a 3-way interaction term between `color_1` and `color_2` to represent the "color scheme" of the outfit. This will allow the model to consider, for example, if an outfit has both red and green, or if it has black and white, and so on.
+I've also decided to include an interaction term between `color_1` and `color_2` to represent the "color scheme" of the outfit. This will allow the model to consider, for example, if an outfit has both red and green, or if it has black and white, and so on.
 
-### K-Fold
+### K-Fold Cross Validation
+For our project, we will be using k-fold cross validation with a *k* value of 3, which is a process that splits up the training data into k different groups and then chooses one as the validation group, then fits the model using the rest of the groups as training, repeating the process *k* times. This process is useful since it produces less variance in the estimates of the model's performance.
+
+```{r}
+set.seed(222)
+outfits_fold <- vfold_cv(outfits_train, v=10)
+```
+
+### Model Building
+The models that we will be using for this data, as mentioned before, will be regression models. The following are the ones I've chosen to include:
+
+* Linear regression
+* Elastic net 
+* K-nearest neighbors
+* Random Forest
+* Boosted Trees
+
+First, we will set up the models.
+
+```{r}
+# Linear Model
+lm_model <- linear_reg() %>% 
+  set_engine("lm")
+
+
+# K-nearest neighbors, tuning neighbors
+knn_model <- nearest_neighbor(neighbors = tune()) %>% 
+  set_mode("regression") %>% 
+  set_engine("kknn")
+
+
+# Elastic net, tuning penalty and mixture
+elastic_model <- linear_reg(penalty = tune(), 
+                           mixture = tune()) %>% 
+  set_mode("regression") %>% 
+  set_engine("glmnet")
+
+
+# Random forest, tuning mtry, trees, and min_n
+rf_model <- rand_forest(mtry = tune(), 
+                       trees = tune(), 
+                       min_n = tune()) %>% 
+  set_engine("ranger", importance = "impurity") %>% 
+  set_mode("regression")
+
+
+# Boosted trees, tuning trees, learn_rate, and mtry
+boosted_model <- boost_tree(trees = tune(),
+                           learn_rate = tune(),
+                           mtry = tune()) %>%
+  set_engine("xgboost") %>%
+  set_mode("regression")
+```
+
+Next, we will set up the workflows for each model.
+
+```{r}
+lm_wflow <- workflow() %>% 
+  add_model(lm_model) %>% 
+  add_recipe(outfit_recipe)
+
+
+knn_wflow <- workflow() %>% 
+  add_model(knn_model) %>% 
+  add_recipe(outfit_recipe)
+
+
+elastic_wflow <- workflow() %>% 
+  add_recipe(outfit_recipe) %>% 
+  add_model(elastic_model)
+
+
+rf_wflow <- workflow() %>% 
+  add_recipe(outfit_recipe) %>% 
+  add_model(rf_model)
+
+
+boosted_wflow <- workflow() %>% 
+  add_recipe(outfit_recipe) %>% 
+  add_model(boosted_model)
+```
+
+Now we'll make tuning grids for the models with tuning parameters.
+
+```{r}
+knn_grid <- grid_regular(neighbors(range = c(5,20)), levels = 5)
+
+
+elastic_grid <- grid_regular(penalty(),
+                        mixture(range = c(0, 1)),
+                             levels = 10)
+
+
+rf_grid <- grid_regular(mtry(range = c(2, 4)), 
+                        trees(range = c(10, 100)),
+                        min_n(range = c(1, 20)),
+                        levels = 8)
+
+boosted_grid <- grid_regular(mtry(range = c(2, 4)), 
+                        trees(range = c(10, 100)),
+                        learn_rate(range = c(-10, -1)),
+                        levels = 5)
+```
+
+And now the part where my PC takes a minor beating: tuning.
+
+```{r, eval=FALSE}
+knn_tune <- tune_grid(
+    knn_wflow,
+    resamples = outfits_fold,
+    grid = knn_grid
+)
+
+
+elastic_tune <- tune_grid(
+  elastic_wflow,
+  resamples = outfits_fold,
+  grid = elastic_grid
+)
+
+
+rf_tune <- tune_grid(
+  rf_wflow,
+  resamples = outfits_fold,
+  grid = rf_grid
+)
+
+
+boosted_tune <- tune_grid(
+  boosted_wflow,
+  resamples = outfits_fold,
+  grid = boosted_grid
+)
+```
