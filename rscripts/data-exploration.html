@@ -2939,11 +2939,11 @@ lot of different item ids.</p>
 <pre class="r fold-show"><code># Finds the number of unique items in item_1 column
 outfits$item_1 %&gt;% unique() %&gt;% length()</code></pre>
 <pre><code>## [1] 229</code></pre>
-<p>And indeed, there are 229 unique items in <code>item_1</code> alone!
-To further examine the nature of the item columns, we will look at a
-plot of the item frequencies in <code>item_1</code>. Additionally, we’ll
-do a “zoom in” of the top 10 items by frequency in
-<code>item_1</code>.</p>
+<p>And indeed, there are <strong>229 unique items</strong> in
+<code>item_1</code> alone! To further examine the nature of the item
+columns, we will look at a plot of the item frequencies in
+<code>item_1</code>. Additionally, we’ll do a “zoom in” of the top 10
+items by frequency in <code>item_1</code>.</p>
 <pre class="r"><code>outfits %&gt;% ggplot(aes(x = fct_infreq(item_1))) +
   geom_bar(fill = &#39;#F08080&#39;) +
   labs(x = &#39;Item 1&#39;, y=&#39;&#39;, title = &#39;Frequencies of item_1 Items&#39;) +
@@ -2992,11 +2992,11 @@ item_freq_table &lt;- data.frame(item_1 = item1_t5,
   tab_header(
     title = &quot;Top 5 Items by Frequency&quot;
   )</code></pre>
-<div id="nafshhthzg" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<div id="tnpdgzfgoy" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
 <style>html {
 font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
 }
-#nafshhthzg .gt_table {
+#tnpdgzfgoy .gt_table {
 display: table;
 border-collapse: collapse;
 margin-left: auto;
@@ -3020,7 +3020,7 @@ border-left-style: none;
 border-left-width: 2px;
 border-left-color: #D3D3D3;
 }
-#nafshhthzg .gt_heading {
+#tnpdgzfgoy .gt_heading {
 background-color: #FFFFFF;
 text-align: center;
 border-bottom-color: #FFFFFF;
@@ -3031,11 +3031,11 @@ border-right-style: none;
 border-right-width: 1px;
 border-right-color: #D3D3D3;
 }
-#nafshhthzg .gt_caption {
+#tnpdgzfgoy .gt_caption {
 padding-top: 4px;
 padding-bottom: 4px;
 }
-#nafshhthzg .gt_title {
+#tnpdgzfgoy .gt_title {
 color: #333333;
 font-size: 125%;
 font-weight: initial;
@@ -3046,7 +3046,7 @@ padding-right: 5px;
 border-bottom-color: #FFFFFF;
 border-bottom-width: 0;
 }
-#nafshhthzg .gt_subtitle {
+#tnpdgzfgoy .gt_subtitle {
 color: #333333;
 font-size: 85%;
 font-weight: initial;
@@ -3057,12 +3057,12 @@ padding-right: 5px;
 border-top-color: #FFFFFF;
 border-top-width: 0;
 }
-#nafshhthzg .gt_bottom_border {
+#tnpdgzfgoy .gt_bottom_border {
 border-bottom-style: solid;
 border-bottom-width: 2px;
 border-bottom-color: #D3D3D3;
 }
-#nafshhthzg .gt_col_headings {
+#tnpdgzfgoy .gt_col_headings {
 border-top-style: solid;
 border-top-width: 2px;
 border-top-color: #D3D3D3;
@@ -3076,7 +3076,7 @@ border-right-style: none;
 border-right-width: 1px;
 border-right-color: #D3D3D3;
 }
-#nafshhthzg .gt_col_heading {
+#tnpdgzfgoy .gt_col_heading {
 color: #333333;
 background-color: #FFFFFF;
 font-size: 100%;
@@ -3095,7 +3095,7 @@ padding-left: 5px;
 padding-right: 5px;
 overflow-x: hidden;
 }
-#nafshhthzg .gt_column_spanner_outer {
+#tnpdgzfgoy .gt_column_spanner_outer {
 color: #333333;
 background-color: #FFFFFF;
 font-size: 100%;
@@ -3106,13 +3106,13 @@ padding-bottom: 0;
 padding-left: 4px;
 padding-right: 4px;
 }
-#nafshhthzg .gt_column_spanner_outer:first-child {
+#tnpdgzfgoy .gt_column_spanner_outer:first-child {
 padding-left: 0;
 }
-#nafshhthzg .gt_column_spanner_outer:last-child {
+#tnpdgzfgoy .gt_column_spanner_outer:last-child {
 padding-right: 0;
 }
-#nafshhthzg .gt_column_spanner {
+#tnpdgzfgoy .gt_column_spanner {
 border-bottom-style: solid;
 border-bottom-width: 2px;
 border-bottom-color: #D3D3D3;
@@ -3123,7 +3123,7 @@ overflow-x: hidden;
 display: inline-block;
 width: 100%;
 }
-#nafshhthzg .gt_group_heading {
+#tnpdgzfgoy .gt_group_heading {
 padding-top: 8px;
 padding-bottom: 8px;
 padding-left: 5px;
@@ -3148,7 +3148,7 @@ border-right-color: #D3D3D3;
 vertical-align: middle;
 text-align: left;
 }
-#nafshhthzg .gt_empty_group_heading {
+#tnpdgzfgoy .gt_empty_group_heading {
 padding: 0.5px;
 color: #333333;
 background-color: #FFFFFF;
@@ -3162,13 +3162,13 @@ border-bottom-width: 2px;
 border-bottom-color: #D3D3D3;
 vertical-align: middle;
 }
-#nafshhthzg .gt_from_md > :first-child {
+#tnpdgzfgoy .gt_from_md > :first-child {
 margin-top: 0;
 }
-#nafshhthzg .gt_from_md > :last-child {
+#tnpdgzfgoy .gt_from_md > :last-child {
 margin-bottom: 0;
 }
-#nafshhthzg .gt_row {
+#tnpdgzfgoy .gt_row {
 padding-top: 8px;
 padding-bottom: 8px;
 padding-left: 5px;
@@ -3186,7 +3186,7 @@ border-right-color: #D3D3D3;
 vertical-align: middle;
 overflow-x: hidden;
 }
-#nafshhthzg .gt_stub {
+#tnpdgzfgoy .gt_stub {
 color: #333333;
 background-color: #FFFFFF;
 font-size: 100%;
@@ -3198,7 +3198,7 @@ border-right-color: #D3D3D3;
 padding-left: 5px;
 padding-right: 5px;
 }
-#nafshhthzg .gt_stub_row_group {
+#tnpdgzfgoy .gt_stub_row_group {
 color: #333333;
 background-color: #FFFFFF;
 font-size: 100%;
@@ -3211,10 +3211,10 @@ padding-left: 5px;
 padding-right: 5px;
 vertical-align: top;
 }
-#nafshhthzg .gt_row_group_first td {
+#tnpdgzfgoy .gt_row_group_first td {
 border-top-width: 2px;
 }
-#nafshhthzg .gt_summary_row {
+#tnpdgzfgoy .gt_summary_row {
 color: #333333;
 background-color: #FFFFFF;
 text-transform: inherit;
@@ -3223,14 +3223,14 @@ padding-bottom: 8px;
 padding-left: 5px;
 padding-right: 5px;
 }
-#nafshhthzg .gt_first_summary_row {
+#tnpdgzfgoy .gt_first_summary_row {
 border-top-style: solid;
 border-top-color: #D3D3D3;
 }
-#nafshhthzg .gt_first_summary_row.thick {
+#tnpdgzfgoy .gt_first_summary_row.thick {
 border-top-width: 2px;
 }
-#nafshhthzg .gt_last_summary_row {
+#tnpdgzfgoy .gt_last_summary_row {
 padding-top: 8px;
 padding-bottom: 8px;
 padding-left: 5px;
@@ -3239,7 +3239,7 @@ border-bottom-style: solid;
 border-bottom-width: 2px;
 border-bottom-color: #D3D3D3;
 }
-#nafshhthzg .gt_grand_summary_row {
+#tnpdgzfgoy .gt_grand_summary_row {
 color: #333333;
 background-color: #FFFFFF;
 text-transform: inherit;
@@ -3248,7 +3248,7 @@ padding-bottom: 8px;
 padding-left: 5px;
 padding-right: 5px;
 }
-#nafshhthzg .gt_first_grand_summary_row {
+#tnpdgzfgoy .gt_first_grand_summary_row {
 padding-top: 8px;
 padding-bottom: 8px;
 padding-left: 5px;
@@ -3257,10 +3257,10 @@ border-top-style: double;
 border-top-width: 6px;
 border-top-color: #D3D3D3;
 }
-#nafshhthzg .gt_striped {
+#tnpdgzfgoy .gt_striped {
 background-color: rgba(128, 128, 128, 0.05);
 }
-#nafshhthzg .gt_table_body {
+#tnpdgzfgoy .gt_table_body {
 border-top-style: solid;
 border-top-width: 2px;
 border-top-color: #D3D3D3;
@@ -3268,7 +3268,7 @@ border-bottom-style: solid;
 border-bottom-width: 2px;
 border-bottom-color: #D3D3D3;
 }
-#nafshhthzg .gt_footnotes {
+#tnpdgzfgoy .gt_footnotes {
 color: #333333;
 background-color: #FFFFFF;
 border-bottom-style: none;
@@ -3281,7 +3281,7 @@ border-right-style: none;
 border-right-width: 2px;
 border-right-color: #D3D3D3;
 }
-#nafshhthzg .gt_footnote {
+#tnpdgzfgoy .gt_footnote {
 margin: 0px;
 font-size: 90%;
 padding-left: 4px;
@@ -3289,7 +3289,7 @@ padding-right: 4px;
 padding-left: 5px;
 padding-right: 5px;
 }
-#nafshhthzg .gt_sourcenotes {
+#tnpdgzfgoy .gt_sourcenotes {
 color: #333333;
 background-color: #FFFFFF;
 border-bottom-style: none;
@@ -3302,58 +3302,58 @@ border-right-style: none;
 border-right-width: 2px;
 border-right-color: #D3D3D3;
 }
-#nafshhthzg .gt_sourcenote {
+#tnpdgzfgoy .gt_sourcenote {
 font-size: 90%;
 padding-top: 4px;
 padding-bottom: 4px;
 padding-left: 5px;
 padding-right: 5px;
 }
-#nafshhthzg .gt_left {
+#tnpdgzfgoy .gt_left {
 text-align: left;
 }
-#nafshhthzg .gt_center {
+#tnpdgzfgoy .gt_center {
 text-align: center;
 }
-#nafshhthzg .gt_right {
+#tnpdgzfgoy .gt_right {
 text-align: right;
 font-variant-numeric: tabular-nums;
 }
-#nafshhthzg .gt_font_normal {
+#tnpdgzfgoy .gt_font_normal {
 font-weight: normal;
 }
-#nafshhthzg .gt_font_bold {
+#tnpdgzfgoy .gt_font_bold {
 font-weight: bold;
 }
-#nafshhthzg .gt_font_italic {
+#tnpdgzfgoy .gt_font_italic {
 font-style: italic;
 }
-#nafshhthzg .gt_super {
+#tnpdgzfgoy .gt_super {
 font-size: 65%;
 }
-#nafshhthzg .gt_footnote_marks {
+#tnpdgzfgoy .gt_footnote_marks {
 font-style: italic;
 font-weight: normal;
 font-size: 75%;
 vertical-align: 0.4em;
 }
-#nafshhthzg .gt_asterisk {
+#tnpdgzfgoy .gt_asterisk {
 font-size: 100%;
 vertical-align: 0;
 }
-#nafshhthzg .gt_indent_1 {
+#tnpdgzfgoy .gt_indent_1 {
 text-indent: 5px;
 }
-#nafshhthzg .gt_indent_2 {
+#tnpdgzfgoy .gt_indent_2 {
 text-indent: 10px;
 }
-#nafshhthzg .gt_indent_3 {
+#tnpdgzfgoy .gt_indent_3 {
 text-indent: 15px;
 }
-#nafshhthzg .gt_indent_4 {
+#tnpdgzfgoy .gt_indent_4 {
 text-indent: 20px;
 }
-#nafshhthzg .gt_indent_5 {
+#tnpdgzfgoy .gt_indent_5 {
 text-indent: 25px;
 }
 </style>
@@ -3445,11 +3445,11 @@ props</code></pre>
 <p>With some simple arithmetic, this gives us a breakdown of the item
 number proportions:</p>
 <ul>
-<li>8% of the outfits have 4 items,</li>
-<li>15% have 5 items,</li>
-<li>17% have 6 items,</li>
-<li>19% have 7 items, and</li>
-<li>41% have 8 items</li>
+<li><strong>8%</strong> of the outfits have 4 items,</li>
+<li><strong>15%</strong> have 5 items,</li>
+<li><strong>17%</strong> have 6 items,</li>
+<li><strong>19%</strong> have 7 items, and</li>
+<li><strong>41%</strong> have 8 items</li>
 </ul>
 <p>Now we want to see what relationship the items have with likes.
 Before doing so, I will transform the data so that we only have 10
@@ -3644,7 +3644,7 @@ consider when picking out an outfit.</p>
                         data = outfits) %&gt;% 
     step_dummy(all_nominal_predictors()) %&gt;% 
     step_interact(terms = ~ starts_with(&quot;color_1&quot;):starts_with(&quot;color_2&quot;))</code></pre>
-<p>I’ve also decided to include a 3-way interaction term between
+<p>I’ve also decided to include an interaction term between
 <code>color_1</code> and <code>color_2</code> to represent the “color
 scheme” of the outfit. This will allow the model to consider, for
 example, if an outfit has both red and green, or if it has black and
@@ -3653,11 +3653,146 @@ white, and so on.</p>
 <div id="k-fold-cross-validation" class="section level3">
 <h3>K-Fold Cross Validation</h3>
 <p>For our project, we will be using k-fold cross validation with a
-<span class="math inline">\(k\)</span> value of 3, which is a process
-that splits up the training data into <span class="math inline">\(k\)</span> different groups and then chooses one
-as the validation group, then fits the model using the rest of the
-groups as training, repeating the process <span class="math inline">\(k\)</span> times. This process is useful since it
+<em>k</em> value of 3, which is a process that splits up the training
+data into k different groups and then chooses one as the validation
+group, then fits the model using the rest of the groups as training,
+repeating the process <em>k</em> times. This process is useful since it
 produces less variance in the estimates of the model’s performance.</p>
+<pre class="r"><code>set.seed(222)
+outfits_fold &lt;- vfold_cv(outfits_train, v=10)</code></pre>
+</div>
+<div id="model-building" class="section level3">
+<h3>Model Building</h3>
+<p>The models that we will be using for this data, as mentioned before,
+will be regression models. The following are the ones I’ve chosen to
+include:</p>
+<ul>
+<li>Linear regression</li>
+<li>Elastic net</li>
+<li>K-nearest neighbors</li>
+<li>Random Forest</li>
+<li>Boosted Trees</li>
+</ul>
+<p>First, we will set up the models.</p>
+<pre class="r"><code># Linear Model
+lm_model &lt;- linear_reg() %&gt;% 
+  set_engine(&quot;lm&quot;)
+
+
+# K-nearest neighbors, tuning neighbors
+knn_model &lt;- nearest_neighbor(neighbors = tune()) %&gt;% 
+  set_mode(&quot;regression&quot;) %&gt;% 
+  set_engine(&quot;kknn&quot;)
+
+
+# Elastic net, tuning penalty and mixture
+elastic_model &lt;- linear_reg(penalty = tune(), 
+                           mixture = tune()) %&gt;% 
+  set_mode(&quot;regression&quot;) %&gt;% 
+  set_engine(&quot;glmnet&quot;)
+
+
+# Random forest, tuning mtry, trees, and min_n
+rf_model &lt;- rand_forest(mtry = tune(), 
+                       trees = tune(), 
+                       min_n = tune()) %&gt;% 
+  set_engine(&quot;ranger&quot;, importance = &quot;impurity&quot;) %&gt;% 
+  set_mode(&quot;regression&quot;)
+
+
+# Boosted trees, tuning trees, learn_rate, and mtry
+boosted_model &lt;- boost_tree(trees = tune(),
+                           learn_rate = tune(),
+                           mtry = tune()) %&gt;%
+  set_engine(&quot;xgboost&quot;) %&gt;%
+  set_mode(&quot;regression&quot;)</code></pre>
+<p>Next, we will set up the workflows for each model.</p>
+<pre class="r"><code>lm_wflow &lt;- workflow() %&gt;% 
+  add_model(lm_model) %&gt;% 
+  add_recipe(outfit_recipe)
+
+
+knn_wflow &lt;- workflow() %&gt;% 
+  add_model(knn_model) %&gt;% 
+  add_recipe(outfit_recipe)
+
+
+elastic_wflow &lt;- workflow() %&gt;% 
+  add_recipe(outfit_recipe) %&gt;% 
+  add_model(elastic_model)
+
+
+rf_wflow &lt;- workflow() %&gt;% 
+  add_recipe(outfit_recipe) %&gt;% 
+  add_model(rf_model)
+
+
+boosted_wflow &lt;- workflow() %&gt;% 
+  add_recipe(outfit_recipe) %&gt;% 
+  add_model(boosted_model)</code></pre>
+<p>Now we’ll make tuning grids for the models with tuning
+parameters.</p>
+<pre class="r"><code>knn_grid &lt;- grid_regular(neighbors(range = c(5,20)), levels = 5)
+
+
+elastic_grid &lt;- grid_regular(penalty(),
+                        mixture(range = c(0, 1)),
+                             levels = 10)
+
+
+rf_grid &lt;- grid_regular(mtry(range = c(2, 4)), 
+                        trees(range = c(10, 100)),
+                        min_n(range = c(1, 20)),
+                        levels = 8)
+
+boosted_grid &lt;- grid_regular(mtry(range = c(2, 4)), 
+                        trees(range = c(10, 100)),
+                        learn_rate(range = c(-10, -1)),
+                        levels = 5)</code></pre>
+<p>And now the part where my PC takes a minor beating: tuning.</p>
+<pre class="r"><code>knn_tune &lt;- tune_grid(
+    knn_wflow,
+    resamples = outfits_fold,
+    grid = knn_grid
+)
+
+
+elastic_tune &lt;- tune_grid(
+  elastic_wflow,
+  resamples = outfits_fold,
+  grid = elastic_grid
+)
+
+
+rf_tune &lt;- tune_grid(
+  rf_wflow,
+  resamples = outfits_fold,
+  grid = rf_grid
+)
+
+
+boosted_tune &lt;- tune_grid(
+  boosted_wflow,
+  resamples = outfits_fold,
+  grid = boosted_grid
+)</code></pre>
+<p>6 minutes and 39 seconds! Not bad! Now, I’ll save the results and
+load them back in so I don’t have to donate another 6 minutes and 39
+seconds in my future.</p>
+<pre class="r"><code>save(knn_tune, file = &quot;tunings/knn_tune.rda&quot;)
+save(elastic_tune, file = &quot;tunings/elastic_tune.rda&quot;)
+save(rf_tune, file = &quot;tunings/rf_tune.rda&quot;)
+save(boosted_tune, file = &quot;tunings/boosted_tune.rda&quot;)</code></pre>
+<pre class="r"><code>load(&quot;tunings/knn_tune.rda&quot;)
+load(&quot;tunings/elastic_tune.rda&quot;)
+load(&quot;tunings/rf_tune.rda&quot;)
+load(&quot;tunings/boosted_tune.rda&quot;)</code></pre>
+<p><strong>BAM!</strong> Models are fit!* We now want to find the root
+mean square error (RMSE) for each model. The RMSE is a measure of the
+differences between predicted values and actual values, so this will be
+useful in comparing the models’ performances.</p>
+<p>* Linear regression hasn’t been fit since there was no tuning… I bet
+he feels so alone right now… We’ll include him though, don’t worry.</p>
 </div>
 </div>
 

@@ -521,3 +521,25 @@ boosted_tune <- tune_grid(
   grid = boosted_grid
 )
 ```
+
+6 minutes and 39 seconds! Not bad! Now, I'll save the results and load them back in so I don't have to donate another 6 minutes and 39 seconds of my future.
+
+```{r, eval=FALSE}
+save(knn_tune, file = "tunings/knn_tune.rda")
+save(elastic_tune, file = "tunings/elastic_tune.rda")
+save(rf_tune, file = "tunings/rf_tune.rda")
+save(boosted_tune, file = "tunings/boosted_tune.rda")
+```
+
+```{r}
+load("tunings/knn_tune.rda")
+load("tunings/elastic_tune.rda")
+load("tunings/rf_tune.rda")
+load("tunings/boosted_tune.rda")
+```
+
+**BAM!** Models are fit!* We now want to find the root mean square error (RMSE) for each model. The RMSE is a measure of the differences between predicted values and actual values, so this will be useful in comparing the models' performances. 
+
+\* Linear regression hasn't been fit since there was no tuning... I bet he feels so alone right now... We'll include him though, don't worry.
+
+
