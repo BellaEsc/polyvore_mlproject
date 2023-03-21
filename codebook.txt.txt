@@ -1,0 +1,24 @@
+
+## Codebook
+
+This is the codebook for the final data set used in this project (found 
+in polyvore_data/tidy-data.csv)
+
+---------------------------------------------------------------------------------------
+views			The number of times an outfit has been viewed
+
+likes			The number of likes an outfit received (the response variable)
+
+set_id			identifies the particular outfit
+
+item_1 - item_8		gives the name of the item type for up to 8 items in an outfit
+
+color_1 - color_4	gives the unique colors found in the outfit for up to 4 
+			different colors
+---------------------------------------------------------------------------------------
+The values that color_1 - color_4 can take on include red, orange, yellow, green,
+blue, purple, brown, black, gray, white
+
+The values that item_1 - item_8 can take on are all listed in 
+polyvore_data/category_id.txt. Some examples include "Jeans", "Sweaters", "Day Dresses",
+"Ankle Boots", and "Necklaces". 

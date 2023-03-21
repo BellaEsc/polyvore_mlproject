@@ -1,5 +1,5 @@
 ---
-title: "Predicting Outfit Likability"
+title: "Predicting Polyvore Outfit Likes"
 subtitle: "PSTAT 131"
 author: "Isabella Escamilla"
 date: "3/18/23"
@@ -118,13 +118,27 @@ The predictors include up to 8 different outfit elements, with each element havi
 # Data Pre-Processing
 First, I imported the data set and merged the pre-split testing, training, and validation sets so I can have all of the data in one set. Looking at the data frame produced from the json data, we can see that the items column contains dictionaries as its entries.
 
+<p style="text-align:center;"><img src="https://i.imgur.com/u0rA4zV.png" width="50%" height="50%"></p>
+
+
 In order to "unpack" this column, I made a function that takes the `items` column as input and outputs a new data frame containing all of the information expanded out into columns.
 
+<p style="text-align:center;"><img src="https://i.imgur.com/mRIVe9b.png" width="50%" height="50%"></p>
+
+<p style="text-align:center;"><img src="https://i.imgur.com/ihscmPD.png" width="100%" height="100%"></p>
+
+
 I merged this data frame to the original and dropped other columns I knew I wasn't going to use. The next thing I needed to do was extract information from the item names, and I decided to focus on color. I made a function that looks at the words in all of the item name columns and outputs a list of the unique colors it found from the text.
+
+<p style="text-align:center;"><img src="https://i.imgur.com/HJOsCUb.png" width="50%" height="50%"></p>
+
 
 I applied this function to the data frame and turned the unique colors into 4 columns, `color_1`, `color_2`, `color_3`, and `color_4`. I then dropped the item name columns since I no longer needed them.
 
 The original Polyvore Dataset came with a text file, category_id.txt, which includes the category ids and the item types they correspond to. I used this file to map the item ids to their item types to make the data more readable.
+
+<p style="text-align:center;"><img src="https://i.imgur.com/etFSrIw.png" width="100%" height="100%"></p>
+
 
 Finally, I exported the data frame as a csv which I will be importing into R.
 
@@ -387,8 +401,7 @@ With the information gathered from the exploratory data analysis, we can start f
 Regression models will be used for this case because the response variable, `likes`, is numeric (we also have an interesting situation where all of our predictors are categorical). Because there are so many different categories in the item columns, this could lead to a problem of overfitting. For now, we will keep each of these columns to 10 categories.
 
  ## Splitting the Data
-
-Without further ado, we will start by splitting our data into training and testing. I've decided to split it into 70% training and 30% testing, stratifying on the `likes` variable. This ensures that the training and testing have the same distribution of likes.
+Without further ado, we will start by splitting our data into training and testing. I've decided to split it into 70% training and 30% testing, stratifying on the `likes` variable. Stratifying ensures that the training and testing have the same distribution of likes. If the distributions were different, the training data could skew the models one way, leading to poor performance on the testing data.
 
 ```{r, lass.source = 'fold-show'}
 # Setting each item category to the top 9 categories, the rest will be "other"
@@ -435,13 +448,18 @@ outfits_fold <- vfold_cv(outfits_train, v=10)
 ## Model Building
 The models that we will be using for this data, as mentioned before, will be regression models. The following are the ones I've chosen to include:
 
-* Linear regression
+* **Linear regression**
+  * The simplest of the models. Estimates a linear relationship between the predictors and the response, then uses that estimate to make a prediction. 
 * Elastic net 
+  * Similar to linear regression, but adds a "penalty" on the number of predictors. It's elastic because it can do a combination of two different penalties, ridge and LASSO.
 * K-nearest neighbors
+  * Makes predictions by finding the k nearest values, and then takes their average as the prediction
 * Random Forest
+  * Combines multiple decision trees and takes the average of their outcomes to make a decision. Each decision tree arrives at a value by making different splits, such as "is the first color red?" "is item 1 a jacket?" "is the second item skinny jeans?" and then based off of that information it will take an average of the group it ends up in, say 265 likes. In a forest, the trees will ask different questions which allows for a less biased overall answer.
 * Boosted Trees
+  * Makes predictions by iterating through multiple small/weak trees before arriving at the final prediction
 
-First, we will set up the models.
+First, we will set up the models. You'll notice that some of the models have tune() included in some of the parameters. This allows us to tune that parameter to find the value that produces the best predictions.
 
 ```{r, class.source = 'fold-show'}
 # Linear Model
@@ -506,7 +524,7 @@ boosted_wflow <- workflow() %>%
   add_model(boosted_model)
 ```
 
-Now we'll make tuning grids for the models with tuning parameters.
+Now we'll make tuning grids for the models with tuning parameters. These tuning grids specify the ranges of values we want to test for each parameter being tuned. This is important because for models like knn, a higher value of k will lead to a less flexible model and a lower value will be more flexible. We don't know how much flexibility will work the best, so tuning allows us to find out.
 
 ```{r, class.source = 'fold-show'}
 knn_grid <- grid_regular(neighbors(range = c(10,25)), levels = 5)
@@ -700,7 +718,9 @@ One of the most engaging parts of this project was making decisions on how I was
 
 One part of the data where I potentially lost a lot of information was in extracting the color information from the item names. In the future, I want to see if using semantic similarity or text analysis of some kind could extract better information that would lead to improved predictions.
 
-I'm glad that I had the opportunity to explore this data set and explore machine learning through it. I've become familiarized with R, tidyverse, and tidymodels to a degree of confidence that I've really surprised myself with. And now, for my final question: how many likes will my current outfit get, according to my model?
+I'm glad that I had the opportunity to explore this data set and explore machine learning through it. I've become familiarized with R, tidyverse, and tidymodels to a degree of confidence that I've really surprised myself with. And now, for my final question: how many likes will my current outfit get according to my model?
+
+<p style="text-align:center;"><img src="https://i.imgur.com/ZG106g4.png" width="50%" height="50%"></p>
 
 ```{r}
 
