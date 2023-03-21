@@ -38,6 +38,7 @@ library(tidymodels)
 library(xgboost)
 library(kknn)
 library(doParallel)
+library(vip)
 registerDoParallel(cores = parallel::detectCores())
 ```
 
@@ -563,17 +564,18 @@ rf_rmse <- show_best(rf_tune, n=1)$mean %>% round(2)
 
 boosted_rmse <- show_best(boosted_tune, n=1)$mean %>% round(2)
 
-rmse_table <- data.frame('Linear Regression' = lm_rmse,
-                         'KNN' = knn_rmse,
-                         'Elastic' = elastic_rmse,
-                         'Random Forest' = rf_rmse,
-                         'Boosted Trees' = boosted_rmse)
+rmse_table <- data.frame(model = c('Linear Regression',
+                                   'KNN','Elastic Net', 
+                                   'Random Forest', 
+                                   'Boosted Trees'),
+                         RMSE = c(lm_rmse,  knn_rmse, 
+                                  elastic_rmse, rf_rmse, 
+                                  boosted_rmse))
 
-rmse_table %>% gt() %>% 
-  tab_header(
-    title = "Best RMSE of Tuned Models"
-  )
+rmse_table
 ```
+Using the RMSE values to discern between the models, we can see that the **elastic net model** had the **best** performance, and **k-nearest** neighbors had the **worst**. Now, we'll look at some of the autoplots to take a look at how the different tunings performed.
+
 
 ```{r}
 autoplot(elastic_tune, metric='rmse') +
@@ -589,7 +591,7 @@ autoplot(rf_tune, metric='rmse') +
   labs(title='Random Forest') +
   theme_polyvore()
 ```
-The autoplot for the random forest tells us that 100 trees with mtry=4 seems to have the best performance. This makes sense, as having more trees gives the model more flexibility which would be helpful in the case where there are a lot of predictors and categories within those predictors.
+The autoplot for the random forest tells us that 120 trees with mtry=5 seems to have the best performance. This makes sense, as having more trees gives the model more flexibility which would be helpful in the case where there are a lot of predictors and categories within those predictors.
 
 ```{r}
 autoplot(boosted_tune, metric='rmse') +
@@ -597,9 +599,85 @@ autoplot(boosted_tune, metric='rmse') +
   theme_polyvore()
 ```
 
-We can see in the boosted tree metrics that the learning rate of 0.1 worked the best by far, and having 100 trees was also the best, though the change between the number of trees is not very dramatic. This indicates that a faster learning rate was beneficial for the model.
+The learning rate of 0.1 worked the best by far, and having 100 trees was also the best, though the change between the number of trees is not very dramatic. This indicates that a faster learning rate was beneficial for the model.
 
+### Fitting and Testing the Models
+It's finally time to fit our final models onto the training data. I will be fitting the elastic net model since it did the best, and the boosted trees since it performed similarly (and because I'm curious about the tree models).
+```{r}
+best_elastic <- select_best(elastic_tune, metric = 'rmse')
+elastic_final_wflow <- finalize_workflow(elastic_wflow, best_elastic)
+elastic_fit <- fit(elastic_final_wflow, data = outfits)
 
+best_boosted <- select_best(boosted_tune, metric = 'rmse')
+boosted_final_wflow <- finalize_workflow(boosted_wflow, best_boosted)
+boosted_fit <- fit(boosted_final_wflow, data = outfits_train)
+```
 
+The models have been fit, it's now time for testing...
 
+```{r}
+augment(elastic_fit, new_data = outfits_test) %>% 
+  rmse(truth = likes, estimate = .pred)
 
+elastic_test_col <- predict(elastic_fit, new_data = outfits_test) 
+elastic_test_res <- bind_cols(elastic_test_col, outfits_test)
+```
+```{r}
+augment(boosted_fit, new_data = outfits_test) %>% 
+  rmse(truth = likes, estimate = .pred)
+
+boosted_test_col <- predict(boosted_fit, new_data = outfits_test) 
+boosted_test_res <- bind_cols(boosted_test_col, outfits_test)
+```
+
+Both models perform pretty similarly on the testing data, with the elastic net model still beating out the boosted trees model. Both RMSEs end up being around 500, which is not great given the distribution of likes. Without looking at the actual predictions made by the model, I would guess that the model might just be low-balling all of its predictions since the distribution of likes is right-skewed. To see if this is the case, we'll check out a graph of the predicted likes against the actual number of likes
+
+```{r}
+elastic_test_res %>% 
+  ggplot(aes(x = .pred, y = likes)) +
+  geom_point(color = '#643F4B', alpha = .3) +
+  geom_abline(lty = 'longdash') +
+  theme_polyvore()
+```
+
+Even though it's clear the model didn't do well, I'm actually really glad to see that there is somewhat of a positive relationship in the graph. This means that there is *some* information in the data that could help decide if an outfit gets more likes, and perhaps that's all you need to bridge the gap between "fashion disaster" and "acceptable".
+
+I'm curious to see what variables contribute the most to the model, so we will look at a variable importance plot for the boosted tree model.
+
+```{r}
+colors <- c('#F4A4A4', '#682735', '#556177',
+            '#F4A4A4', '#682735', '#556177',
+            '#F4A4A4', '#682735', '#556177',
+            '#F4A4A4')
+boosted_fit %>% extract_fit_parsnip() %>% 
+  vip(aesthetics = list(fill = colors)) +
+  theme_polyvore() +
+  theme(axis.line = element_blank())
+```
+
+Interestingly enough, item_1_sweaters and item_6_sunglasses topped the list of variable importance. I'll be honest: didn't see that coming. All of the variables in this list are actually items, so maybe the takeaway here is that the items you choose to include in your outfit are more important than the colors. 
+
+## Conclusion
+This project was definitely a labor of love. I'm glad I got to see it through even if the models weren't great at predicting the number of likes of a particular outfit. The elastic net model (effectively a lasso regression) ended up being the best model. I think this might have happened because the lasso regression is able to scale variables all the way to zero if they don't help the model enough. After dummy coding, the data includes a *lot* of variables, so it's probably good to trim it back. The fact that KNN was the worst performer makes sense for the same reason: too many predictors. With high numbers of predictors, there aren't enough data points in each dimensional space to effectively use KNN. 
+
+One of the most engaging parts of this project was making decisions on how I was going to transform the data to make it work with the machine learning tools I have at hand. This is where I can see a lot of future improvements. In particular, I would want to see if I could tackle these large numbers of categorical variables in a different way. One approach I was tempted to take was to manually collapse the item categories into simpler ones, such as shirts, pants, dresses, jeans, etc. This could be better if it means less information is lost in this process compared to creating an "other" category.
+
+One part of the data where I potentially lost a lot of information was in extracting the color information from the item names. In the future, I want to see if using semantic similarity or text analysis of some kind could extract better information that would lead to improved predictions.
+
+I'm glad that I had the opportunity to explore this data set and explore machine learning through it. I've become familiarized with R, tidyverse, and tidymodels to a degree of confidence that I've really surprised myself with. And now, for my final question: how many likes will my current outfit get, according to my model?
+
+```{r}
+
+my_outfit <- data.frame('views' = 0, 'likes' = 0, 'set_id' = 1,
+                        'item_1' = 'Sweaters', 'item_2' = 'Pants',
+                        'item_3' = 'Other', 'item_4' = 'Other',
+                        'item_5' = 'None', 'item_6' = 'None',
+                        'item_7' = 'None', 'item_8' = 'None',
+                        'color_1' = 'red', 'color_2' = 'gray',
+                        'color_3' = 'white', 'color_4' = 'none')
+my_outfit[sapply(outfits, is.character)] <- lapply(outfits[sapply(outfits, is.character)], as.factor)
+
+predict(elastic_fit, new_data = my_outfit)
+```
+
+Not to brag, but my model thinks my outfit will get 331 likes. 
