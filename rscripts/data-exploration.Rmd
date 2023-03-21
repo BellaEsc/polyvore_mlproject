@@ -366,3 +366,17 @@ outfits_test <- testing(outfits_split)
 
 
 ### Creating a Recipe
+The next step is to make a recipe that our models will use to fit the data. In our case, this is pretty analogous to constructing an outfit. Which colors should I include and how many? Should I wear a coat? What about boots? We can get this information from `item_1` through `item_8` and `color_1` through `color_4`. I'm excluding `views` because even though it's probably a good predictor, it isn't really something you consider when picking out an outfit. 
+
+```{r}
+outfit_recipe <- recipe(likes ~ item_1 + item_2 + item_3 + item_4 +
+                          item_5 + item_6 + item_7 + item_8 +
+                          color_1 + color_2 + color_3 + color_4,
+                        data = outfits) %>% 
+    step_dummy(all_nominal_predictors()) %>% 
+    step_interact(terms = ~ starts_with("color_1"):starts_with("color_2"))
+```
+
+I've also decided to include a 3-way interaction term between `color_1` and `color_2` to represent the "color scheme" of the outfit. This will allow the model to consider, for example, if an outfit has both red and green, or if it has black and white, and so on.
+
+### K-Fold
