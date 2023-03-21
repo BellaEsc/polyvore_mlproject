@@ -472,7 +472,7 @@ boosted_wflow <- workflow() %>%
 Now we'll make tuning grids for the models with tuning parameters.
 
 ```{r, class.source = 'fold-show'}
-knn_grid <- grid_regular(neighbors(range = c(5,20)), levels = 5)
+knn_grid <- grid_regular(neighbors(range = c(10,25)), levels = 5)
 
 
 elastic_grid <- grid_regular(penalty(),
@@ -480,8 +480,8 @@ elastic_grid <- grid_regular(penalty(),
                              levels = 10)
 
 
-rf_grid <- grid_regular(mtry(range = c(2, 4)), 
-                        trees(range = c(10, 100)),
+rf_grid <- grid_regular(mtry(range = c(3, 5)), 
+                        trees(range = c(10, 150)),
                         min_n(range = c(1, 20)),
                         levels = 8)
 
@@ -500,20 +500,17 @@ knn_tune <- tune_grid(
     grid = knn_grid
 )
 
-
 elastic_tune <- tune_grid(
   elastic_wflow,
   resamples = outfits_fold,
   grid = elastic_grid
 )
 
-
 rf_tune <- tune_grid(
   rf_wflow,
   resamples = outfits_fold,
   grid = rf_grid
 )
-
 
 boosted_tune <- tune_grid(
   boosted_wflow,
@@ -530,6 +527,8 @@ save(elastic_tune, file = "tunings/elastic_tune.rda")
 save(rf_tune, file = "tunings/rf_tune.rda")
 save(boosted_tune, file = "tunings/boosted_tune.rda")
 ```
+
+
 
 ```{r}
 load("tunings/knn_tune.rda")
