@@ -547,7 +547,8 @@ lm_fit <- fit_resamples(lm_wflow, resamples = outfits_fold)
 save(lm_fit, file = "tunings/lm_fit.rda")
 ```
 
-Now we can look at the performance and 
+Now we can look at the performance of the model on the training data. First, we'll look at the RMSE and then we'll look at the autoplots of the tuned model.
+
 ```{r}
 load("tunings/lm_fit.rda")
 
@@ -572,6 +573,28 @@ rmse_table %>% gt() %>%
     title = "Best RMSE of Tuned Models"
   )
 ```
+
+```{r}
+autoplot(knn_tune, metric='rmse') + theme_polyvore() -> p1
+
+autoplot(elastic_tune, metric='rmse') + theme_polyvore() -> p2
+
+autoplot(rf_tune, metric='rmse') + theme_polyvore() -> p3
+
+autoplot(boosted_tune, metric='rmse') + theme_polyvore() -> p4
+
+grid.arrange(p1, p2, p3, p4, ncol=2)
+```
+
+
+```{r}
+
+```
+
+```{r}
+
+```
+
 
 
 
