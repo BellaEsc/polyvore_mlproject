@@ -165,7 +165,7 @@ Finally, I exported the data frame as a csv which I will be importing into R.
 ## Missing Values
 You might have noticed in the pre-processing step that there are some colors and item names that are "none". The reason for this is that in the original data set, the nested lists are not all the same length; the outfits can each have 4 to 8 items. For the ones with fewer than 8 items, I had to backfill them, but I didn't want to treat it as "missing" since the information that the outfit only has 4 items can be useful. The same goes for the color columns: some outfits only had 1, 2 or 3 unique colors. Again, the information that there's only one color present in the outfit can be useful, so I've kept "none" as its own category.
 
-There wasn't missing data in the original data set, but there were some outfits that I couldn't "extract" color from with my function, so I dropped them from the final set.
+There weren't missing data in the original data set, but there were some outfits that I couldn't "extract" color from with my function, so I dropped them from the final set.
 
 
 # Exploratory Data Analysis
@@ -185,7 +185,7 @@ outfits %>% head(5)
 ```
 
 
-In the final data set, there are 14 variables:
+In the final data set, there are 15 variables:
 
 Name | Variable description
 ---|---
@@ -458,7 +458,7 @@ outfit_recipe <- recipe(likes ~ item_1 + item_2 + item_3 + item_4 +
 I've also decided to include an interaction term between `color_1` and `color_2` to represent the "color scheme" of the outfit. This will allow the model to consider, for example, if an outfit has both red and green, or if it has black and white, and so on.
 
 ## K-Fold Cross Validation
-For our project, we will be using k-fold cross validation with a *k* value of 3, which is a process that splits up the training data into k different groups and then chooses one as the validation group, then fits the model using the rest of the groups as training, repeating the process *k* times. This process is useful since it produces less variance in the estimates of the model's performance.
+For our project, we will be using k-fold cross validation with a *k* value of 10, which is a process that splits up the training data into k different groups and then chooses one as the validation group, then fits the model using the rest of the groups as training, repeating the process *k* times. This process is useful since it produces less variance in the estimates of the model's performance.
 
 ```{r, class.source = 'fold-show'}
 set.seed(222)
