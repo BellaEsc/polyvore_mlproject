@@ -420,7 +420,7 @@ With the information gathered from the exploratory data analysis, we can start f
 
 Regression models will be used for this case because the response variable, `likes`, is numeric (we also have an interesting situation where all of our predictors are categorical). Because there are so many different categories in the item columns, this could lead to a problem of overfitting. For now, we will keep each of these columns to 10 categories.
 
- ## Splitting the Data
+## Splitting the Data
 Without further ado, we will start by splitting our data into training and testing. I've decided to split it into 70% training and 30% testing, stratifying on the `likes` variable. Stratifying ensures that the training and testing have the same distribution of likes. If the distributions were different, the training data could skew the models one way, leading to poor performance on the testing data.
 
 ```{r, lass.source = 'fold-show'}
