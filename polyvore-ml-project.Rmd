@@ -121,7 +121,7 @@ theme_polyvore <- function(){
 The goal of this project is to find a machine learning model that can take in "visual" predictors, such as color or type of clothing, and output a predicted number of likes.
 
 ## Data Set Overview
-The data set that I am (hopefully) working with is called **Polyvore Dataset** which was gathered for a paper by Han, Xintong and Wu, Zuxuan and Jiang, Yu-Gang and Davis, Larry S. The [GitHub page containing the data set](https://github.com/xthan/polyvore-dataset) also includes the link to the paper, "Learning Fashion Compatibility with Bidirectional LSTMs".
+The data set that I am working with is called **Polyvore Dataset** which was gathered for a paper by Han, Xintong and Wu, Zuxuan and Jiang, Yu-Gang and Davis, Larry S. The [GitHub page containing the data set](https://github.com/xthan/polyvore-dataset) also includes the link to the paper, "Learning Fashion Compatibility with Bidirectional LSTMs".
 
 The files containing the data have been pre-separated into training, validation, and testing, with each containing **17,316**, **1,497**, and **3,076** observations, respectively.
 
@@ -133,7 +133,7 @@ Each observation in the data set is one of these outfits, which includes general
 
 <p style="text-align:center;"><img src="https://i.imgur.com/R7klliS.jpg" width="50%" height="50%"></p>
 
-The predictors include up to 8 different outfit elements, with each element having 6 attributes. In other words, there can be up to 48 different predictors. In order to make this data usable for the machine learning tools I will be using, I need to do some pre-processing. I've decided to do this step in Python, and there is a decent amount of code involved. I'll go over the basic steps I taken to arrive at the final data frame, but the jupyter notebook with the full process is available on my [Github page](https://github.com/BellaEsc/polyvore_mlproject) if you're interested.
+The predictors include up to 8 different outfit elements, with each element having 6 attributes. In other words, there can be up to 48 different predictors. In order to make this data usable for the machine learning tools I will be using, I need to do some pre-processing. I've decided to do this step in Python, and there is a decent amount of code involved. I'll go over the basic steps taken to arrive at the final data frame, but the jupyter notebook with the full process is available on my [Github page](https://github.com/BellaEsc/polyvore_mlproject) if you're interested.
 
 # Data Pre-Processing
 First, I imported the data set and merged the pre-split testing, training, and validation sets so I can have all of the data in one set. Looking at the data frame produced from the json data, we can see that the items column contains dictionaries as its entries.
@@ -163,7 +163,7 @@ The original Polyvore Dataset came with a text file, category_id.txt, which incl
 Finally, I exported the data frame as a csv which I will be importing into R.
 
 ## Missing Values
-You might have noticed in the pre-processing step that there are some colors and item names that are "none". The reason for this is that in the original data set, the nested lists are not all the same length; the outfits can each have 4 to 8 items. For the ones with fewer items than 8, I had to backfill them, but I didn't want to treat it as "missing" since the information that the outfit only has 4 items can be useful. The same goes for the color columns: some outfits only had 1, 2 or 3 unique colors. Again, the information that there's only one color present in the outfit can be useful, so I've kept "none" as its own category.
+You might have noticed in the pre-processing step that there are some colors and item names that are "none". The reason for this is that in the original data set, the nested lists are not all the same length; the outfits can each have 4 to 8 items. For the ones with fewer than 8 items, I had to backfill them, but I didn't want to treat it as "missing" since the information that the outfit only has 4 items can be useful. The same goes for the color columns: some outfits only had 1, 2 or 3 unique colors. Again, the information that there's only one color present in the outfit can be useful, so I've kept "none" as its own category.
 
 There wasn't missing data in the original data set, but there were some outfits that I couldn't "extract" color from with my function, so I dropped them from the final set.
 
@@ -379,7 +379,7 @@ grid.arrange(p1, p2, p3, p4, ncol=2)
 
 The color columns are similar to the item columns in the way they are ordered: `color_1` will have higher importance than `color_2` (and so on) in the outfit due to the way the information was extracted. This gives us some insight into the colors represented in these charts.
 
-Red clearly reigns supreme for `color_1`, followed by blue, white, and black. We start to see "none" dominate starting in `color_2`, indicating that there are lots of outfits for which only one color could be extracted (or simply had a monochromatic scheme going on). In `color_4`, we see that most of the outfits simply don't have a color entry. This could mean that most outfits stuck to 1-3 colors.
+Red clearly reigns supreme for `color_1`, followed by blue, white, and black. We start to see "none" dominate starting in `color_2`, indicating that there are lots of outfits for which only one color could be extracted (or had a monochromatic scheme going on). In `color_4`, we see that most of the outfits simply don't have a color entry. This could mean that most outfits stuck to 1-3 colors.
 
 Next, we'll take a look at the relationship between color and likes. 
 
@@ -473,11 +473,11 @@ The models that we will be using for this data, as mentioned before, will be reg
 * **Elastic net** 
   * Similar to linear regression, but adds a "penalty" on the number of predictors. It's elastic because it can do a combination of two different penalties, ridge and LASSO.
 * **K-nearest neighbors**
-  * Makes predictions by finding the k nearest values, and then takes their average as the prediction
+  * Makes predictions by finding the k nearest values, and then takes their average as the prediction.
 * **Random Forest**
-  * Combines multiple decision trees and takes the average of their outcomes to make a decision. Each decision tree arrives at a value by making different splits, such as "is the first color red?" "is item 1 a jacket?" "is the second item skinny jeans?" and then based off of that information it will take an average of the group it ends up in, say 265 likes. In a forest, the trees will ask different questions which allows for a less biased overall answer.
+  * Combines multiple decision trees and takes the average of their outcomes to make a decision. Each decision tree arrives at a value by making different splits, such as "is the first color red?" "is item 1 a jacket?" "is the second item skinny jeans?" and then based off of that information it will take an average of the group it ends up in, perhaps 265 likes. In a forest, each tree will try to ask different questions which allows for a less biased overall answer.
 * **Boosted Trees**
-  * Makes predictions by iterating through multiple small/weak trees before arriving at the final prediction
+  * Makes predictions by iterating through multiple small/weak trees before arriving at the final prediction.
 
 First, we will set up the models. You'll notice that some of the models have tune() included in some of the parameters. This allows us to tune that parameter to find the value that produces the best predictions.
 
@@ -648,7 +648,7 @@ rmse_table <- data.frame(model = c('Linear Regression',
 
 rmse_table
 ```
-Using the RMSE values to discern between the models, we can see that the **elastic net model** had the **best** performance, and **k-nearest** neighbors had the **worst**. Now, we'll look at some of the autoplots to take a look at how the different tunings performed.
+Using the RMSE values to discern between the models, we can see that the **elastic net model** had the **best** performance, and **k-nearest neighbors** had the **worst**. Now, we'll look at some of the autoplots to take a look at how the different tunings performed.
 
 
 ```{r}
@@ -659,12 +659,12 @@ autoplot(elastic_tune, metric='rmse') +
 
 We can see from the elastic net model that having a lasso penalty of 1 and a mixture of 1 gives the best results. What this means is that the model that performed the best was a lasso regression.
 
-
 ```{r}
 autoplot(rf_tune, metric='rmse') +
   labs(title='Random Forest') +
   theme_polyvore()
 ```
+
 The autoplot for the random forest tells us that 120 trees with mtry=5 seems to have the best performance. This makes sense, as having more trees gives the model more flexibility which would be helpful in the case where there are a lot of predictors and categories within those predictors.
 
 ```{r}
